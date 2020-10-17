@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Checkbox } from 'carbon-components-svelte';
+  import { Checkbox, Grid, Row, Tile, Column } from 'carbon-components-svelte';
 
   import type { IStudent } from './interfaces';
 
@@ -9,83 +9,95 @@
   export let onShowActions: (s: Array<IStudent>) => void;
   export let setSelecteds: (s: Array<string>) => void;
   export let onEditStudent: (s: IStudent) => void;
+  let sortedStudents = students.sort((a, b) => {
+    const nameA = a.name.toUpperCase();
+    const nameB = b.name.toUpperCase();
+    let comparison = 0;
+    if (nameA > nameB) {
+      comparison = 1;
+    } else if (nameA < nameB) {
+      comparison = -1;
+    }
+    return comparison;
+  });
 </script>
 
 <style>
-  tr {
-    border-bottom: 10px solid white;
-  }
-  td {
-    text-align: center;
-    background-color: rgb(102, 100, 100, 0.3);
+  .card {
     padding: 10px;
-    border: none;
-    white-space: nowrap;
+    padding-left: 0px;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    align-items: center;
   }
-  .table {
-    width: 100%;
-    border-collapse: collapse;
-    max-width: min(1000px, 90%);
+  .row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+  }
+  .name {
+    font-size: 18px;
+    padding: 0 10px;
+    font-weight: 500;
+  }
+  .number {
+    font-size: 20px;
+    font-weight: 500;
   }
 </style>
 
-<table class="table">
-  <thead>
-    <tr>
-      <th>select</th>
-      <th>Name</th>
-      <th>Group</th>
-      <th>Punctuation</th>
-      <th>Historic</th>
-      <th />
-    </tr>
-  </thead>
-  <tbody>
-    {#each students as student}
-      <tr
-        on:click={() => {
-          onShowActions([student]);
-        }}>
-        <td>
-          <Checkbox
-            on:click={e => {
-              e.stopImmediatePropagation();
-            }}
-            on:check={e => {
-              if (!selecteds.includes(student.id)) {
-                setSelecteds([...selecteds, student.id]);
-              } else {
-                const idx = selecteds.indexOf(student.id);
-                if (idx > -1) selecteds.splice(idx, 1);
-                setSelecteds([...selecteds]);
-              }
-            }} />
-        </td>
-        <td>{student.name}</td>
-        <td>{student.group}</td>
-        <td>
-          {student.events.reduce((acc, s) => {
-            acc = acc + s.puntuation;
-            return acc;
-          }, 0)}
-        </td>
-        <td
-          on:click={e => {
-            e.preventDefault();
-            e.stopImmediatePropagation();
-            onShowHistory(student);
-          }}>
-          View
-        </td>
-        <td
-          on:click={e => {
-            e.preventDefault();
-            e.stopImmediatePropagation();
-            onEditStudent(student);
-          }}>
-          Edit
-        </td>
-      </tr>
+<Grid fullWidth noGutter>
+  <Row>
+    {#each sortedStudents as student}
+      <Column>
+        <div class="card" on:click={() => onShowActions([student])}>
+          <Tile light={selecteds.includes(student.id)}>
+            <div class="row">
+              <Checkbox
+                checked={selecteds.includes(student.id)}
+                on:click={e => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  if (!selecteds.includes(student.id)) {
+                    setSelecteds([...selecteds, student.id]);
+                  } else {
+                    const idx = selecteds.indexOf(student.id);
+                    if (idx > -1) selecteds.splice(idx, 1);
+                    setSelecteds([...selecteds]);
+                  }
+                }} />
+              <div class="number">
+                {student.events.reduce((acc, s) => {
+                  acc = acc + s.puntuation;
+                  return acc;
+                }, 0)}
+              </div>
+            </div>
+            <div class="name">{student.name}</div>
+            <div class="row">
+              <div
+                on:click={e => {
+                  e.preventDefault();
+                  e.stopImmediatePropagation();
+                  onShowHistory(student);
+                }}>
+                View
+              </div>
+              <div
+                on:click={e => {
+                  e.preventDefault();
+                  e.stopImmediatePropagation();
+                  onEditStudent(student);
+                }}>
+                Edit
+              </div>
+            </div>
+          </Tile>
+        </div>
+      </Column>
     {/each}
-  </tbody>
-</table>
+  </Row>
+</Grid>

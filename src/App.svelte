@@ -1,12 +1,11 @@
 <script lang="ts">
   import { afterUpdate } from 'svelte';
   import Actions from './Actions.svelte';
-  import { Button, Modal } from 'carbon-components-svelte';
+  import { Button, ButtonSet } from 'carbon-components-svelte';
   import CreateEvent from './CreateEvent.svelte';
   import CreateGroup from './CreateGroup.svelte';
   import CreateStudent from './CreateStudent.svelte';
   import EditStudent from './EditStudent.svelte';
-  import Header from './Header.svelte';
   import History from './History.svelte';
   import type { IAction, IStudent } from './interfaces';
   import StudentsTable from './StudentsTable.svelte';
@@ -22,7 +21,9 @@
   let modalToShow: string = !groups.length ? 'showCreateGroup' : '';
   let groupSelected =
     localStorage.getItem('groupSelected') || (groups.length && groups[0]) || '';
-
+  let studentsInGroup: Array<IStudent> = students.filter(
+    s => s.group === groupSelected
+  );
   let positiveEvents: Array<IAction> =
     JSON.parse(localStorage.getItem('positiveEvents')) || [];
   let negativeEvents: Array<IAction> =
@@ -97,21 +98,28 @@
   {positiveEvents}
   {negativeEvents}
   {showModal}>
+  <ButtonSet>
+    <Button
+      kind="secondary"
+      on:click={() => setSelecteds(selecteds.length === studentsInGroup.length ? [] : (selecteds = studentsInGroup.map(s => s.id)))}>
+      Select all
+    </Button>
+    {#if selecteds.length > 0}
+      <Button
+        on:click={() => onShowActions(selecteds.map(s =>
+              studentsInGroup.find(st => st.id === s)
+            ))}>
+        Add event
+      </Button>
+    {/if}
+  </ButtonSet>
   <StudentsTable
-    students={students.filter(s => s.group === groupSelected)}
+    students={studentsInGroup}
     {onShowHistory}
     {selecteds}
     {setSelecteds}
     {onShowActions}
     {onEditStudent} />
-  {#if selecteds.length > 0}
-    <Button
-      on:click={() => onShowActions(selecteds.map(s =>
-            students.find(st => st.id === s)
-          ))}>
-      Add event
-    </Button>
-  {/if}
 </Layout>
 <CreateGroup
   {close}
