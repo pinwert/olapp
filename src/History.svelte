@@ -1,7 +1,9 @@
 <script lang="ts">
+  import { Modal } from 'carbon-components-svelte';
   import type { IStudent } from './interfaces';
-
-  export let student: IStudent;
+  export let student: IStudent | undefined;
+  export let close: () => void;
+  export let open: boolean;
 </script>
 
 <style>
@@ -22,35 +24,43 @@
   }
 </style>
 
-<table class="table">
-  <thead>
-    <tr>
-      <th>event</th>
-      <th>date</th>
-      <th>Punctuation</th>
-    </tr>
-  </thead>
-  <tbody>
-    {#each student.events as event}
-      <tr>
-        <td>{event.eventType}</td>
-        <td>
-          {(() => {
-            const d = new Date(event.createdAt);
-            const ye = new Intl.DateTimeFormat('en', {
-              year: 'numeric',
-            }).format(d);
-            const mo = new Intl.DateTimeFormat('en', {
-              month: 'short',
-            }).format(d);
-            const da = new Intl.DateTimeFormat('en', {
-              day: '2-digit',
-            }).format(d);
-            return `${da}-${mo}-${ye}`;
-          })()}
-        </td>
-        <td>{event.puntuation}</td>
-      </tr>
-    {/each}
-  </tbody>
-</table>
+<Modal
+  {open}
+  passiveModal
+  modalHeading={`History for: ${student && student.name}`}
+  on:close={close}>
+  {#if student}
+    <table class="table">
+      <thead>
+        <tr>
+          <th>event</th>
+          <th>date</th>
+          <th>Punctuation</th>
+        </tr>
+      </thead>
+      <tbody>
+        {#each student.events as event}
+          <tr>
+            <td>{event.eventType}</td>
+            <td>
+              {(() => {
+                const d = new Date(event.createdAt);
+                const ye = new Intl.DateTimeFormat('en', {
+                  year: 'numeric',
+                }).format(d);
+                const mo = new Intl.DateTimeFormat('en', {
+                  month: 'short',
+                }).format(d);
+                const da = new Intl.DateTimeFormat('en', {
+                  day: '2-digit',
+                }).format(d);
+                return `${da}-${mo}-${ye}`;
+              })()}
+            </td>
+            <td>{event.puntuation}</td>
+          </tr>
+        {/each}
+      </tbody>
+    </table>
+  {/if}
+</Modal>

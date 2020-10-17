@@ -1,9 +1,11 @@
 <script lang="ts">
   import type { IAction } from './interfaces';
+  import { Modal } from 'carbon-components-svelte';
   export let setEvent: (e: IAction) => void;
-
   export let positiveEvents: Array<IAction>;
   export let negativeEvents: Array<IAction>;
+  export let close: () => void;
+  export let open: boolean;
 </script>
 
 <style>
@@ -40,15 +42,17 @@
   }
 </style>
 
-<div class="row">
-  <div class="positive column">
-    {#each positiveEvents as event}
-      <div class="event" on:click={() => setEvent(event)}>{event.label}</div>
-    {/each}
+<Modal {open} modalHeading="Set event" on:close={close} passiveModal>
+  <div class="row">
+    <div class="positive column">
+      {#each positiveEvents as event}
+        <div class="event" on:click={() => setEvent(event)}>{event.label}</div>
+      {/each}
+    </div>
+    <div class="negative column">
+      {#each negativeEvents as event}
+        <div class="event" on:click={() => setEvent(event)}>{event.label}</div>
+      {/each}
+    </div>
   </div>
-  <div class="negative column">
-    {#each negativeEvents as event}
-      <div class="event" on:click={() => setEvent(event)}>{event.label}</div>
-    {/each}
-  </div>
-</div>
+</Modal>

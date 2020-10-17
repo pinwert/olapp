@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { IAction, IStudent } from './interfaces';
+  import { Button } from 'carbon-components-svelte';
 
   export let students: Array<IStudent>;
   export let groups: Array<string>;
@@ -32,10 +33,6 @@
 </script>
 
 <style>
-  button {
-    padding: 7px 20px;
-    margin: 0 20px;
-  }
 </style>
 
-<button on:click={exportData}>Export data</button>
+<Button on:click={exportData}>Export data</Button>

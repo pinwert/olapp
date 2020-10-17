@@ -13,5 +13,6 @@ export interface IStudent {
   id: string;
   name: string;
   group: string;
+  disabled?: boolean;
   events: Array<IEvent>;
 }

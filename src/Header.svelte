@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { Button } from 'carbon-components-svelte';
   import Export from './Export.svelte';
   import Inport from './Inport.svelte';
   import type { IAction, IStudent } from './interfaces';
@@ -29,10 +30,6 @@
     width: 100%;
     padding: 0 20px;
   }
-  button {
-    padding: 7px 20px;
-    margin: 0 20px;
-  }
   select {
     min-width: 100px;
   }
@@ -54,10 +51,16 @@
       <option value={group}>{group}</option>
     {/each}
   </select>
-  <button on:click={() => showModal('showCreateGroup')}>Create Group</button>
-  <button on:click={() => showModal('showCreateStudent')}>Create Student</button>
-  <button on:click={() => showModal('showCreatePositive')}>Create Positive</button>
-  <button on:click={() => showModal('showCreateNegative')}>Create Negative</button>
+  <Button on:click={() => showModal('showCreateGroup')}>Create Group</Button>
+  <Button on:click={() => showModal('showCreateStudent')}>
+    Create Student
+  </Button>
+  <Button on:click={() => showModal('showCreatePositive')}>
+    Create Positive
+  </Button>
+  <Button on:click={() => showModal('showCreateNegative')}>
+    Create Negative
+  </Button>
   <Export {students} {groups} {positiveEvents} {negativeEvents} />
   <Inport {inportData} />
 </header>

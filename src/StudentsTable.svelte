@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { Checkbox } from 'carbon-components-svelte';
+
   import type { IStudent } from './interfaces';
 
   export let students: Array<IStudent>;
@@ -6,6 +8,7 @@
   export let onShowHistory: (s: IStudent) => void;
   export let onShowActions: (s: Array<IStudent>) => void;
   export let setSelecteds: (s: Array<string>) => void;
+  export let onEditStudent: (s: IStudent) => void;
 </script>
 
 <style>
@@ -34,6 +37,7 @@
       <th>Group</th>
       <th>Punctuation</th>
       <th>Historic</th>
+      <th />
     </tr>
   </thead>
   <tbody>
@@ -43,13 +47,12 @@
           onShowActions([student]);
         }}>
         <td>
-          <input
-            type="checkbox"
+          <Checkbox
             on:click={e => {
               e.stopImmediatePropagation();
             }}
-            on:change={e => {
-              if (e.currentTarget.checked) {
+            on:check={e => {
+              if (!selecteds.includes(student.id)) {
                 setSelecteds([...selecteds, student.id]);
               } else {
                 const idx = selecteds.indexOf(student.id);
@@ -73,6 +76,14 @@
             onShowHistory(student);
           }}>
           View
+        </td>
+        <td
+          on:click={e => {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            onEditStudent(student);
+          }}>
+          Edit
         </td>
       </tr>
     {/each}

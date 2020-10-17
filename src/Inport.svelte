@@ -1,5 +1,6 @@
 <script lang="ts">
   export let inportData: (obj: {}) => void;
+  import { Button } from 'carbon-components-svelte';
 
   function inport() {
     let element = document.createElement('input');
@@ -23,10 +24,6 @@
 </script>
 
 <style>
-  button {
-    padding: 7px 20px;
-    margin: 0 20px;
-  }
 </style>
 
-<button on:click={inport}>Import data</button>
+<Button on:click={inport}>Import data</Button>
