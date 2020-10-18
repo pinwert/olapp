@@ -39,12 +39,6 @@
           return comparison;
       }
     });
-  beforeUpdate(() =>
-    console.log(
-      sortedStudents.map(s => s.puntuation),
-      sortBy
-    )
-  );
 </script>
 
 <style>
@@ -85,6 +79,7 @@
             style="cursor: pointer;">
             <div class="row">
               <Checkbox
+                style="padding: 10px"
                 checked={selecteds.includes(student.id)}
                 on:click={e => {
                   e.stopPropagation();

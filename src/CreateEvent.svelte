@@ -9,8 +9,9 @@
   export let send: (e: IAction) => void;
   export let close: () => void;
   export let open: boolean;
-  let label: string;
-  let puntuaction: string;
+  export let title: string;
+  let label: string = '';
+  let puntuaction: string = '0';
 </script>
 
 <style>
@@ -18,17 +19,17 @@
 
 <Modal
   {open}
-  modalHeading="Create positive event"
+  modalHeading={title}
   on:close={close}
   primaryButtonText="Confirm"
   secondaryButtonText="Cancel"
   on:click:button--secondary={close}
   on:submit={() => {
-    const newNegativeEvent = { label: label, puntuaction: Number(puntuaction) };
-    send(newNegativeEvent);
+    const newEvent = { label, puntuaction: Number(puntuaction) };
+    send(newEvent);
   }}>
   <Form>
     <TextInput labelText="Label" value={label} />
-    <NumberInput label="Puntuation" value={puntuaction} />
+    <NumberInput mobile label="Puntuation" value={puntuaction} />
   </Form>
 </Modal>

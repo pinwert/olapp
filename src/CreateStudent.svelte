@@ -7,12 +7,11 @@
     SelectItem,
     TextInput,
   } from 'carbon-components-svelte';
-  import { beforeUpdate } from 'svelte';
   export let send: (e: IStudent) => void;
   export let groups: Array<string>;
   export let close: () => void;
   export let open: boolean;
-  let name: string;
+  let name: string = '';
   export let group: string;
 </script>
 
@@ -43,6 +42,6 @@
         {/each}
       </Select>
     {/if}
-    <TextInput labelText="Name" bind:value={name} />
+    <TextInput labelText="Name" value={name} />
   </Form>
 </Modal>

@@ -12,6 +12,7 @@
     Checkbox,
     Modal,
   } from 'carbon-components-svelte';
+  import { beforeUpdate } from 'svelte';
   export let name: string;
   export let student: IStudent;
   export let setEvent: (e: IAction) => void;
@@ -21,11 +22,18 @@
   export let negativeEvents: Array<IAction>;
   export let close: () => void;
   export let open: boolean;
-  $: newStudent = { ...student };
-  let label: string;
+  let newStudent = student;
+  let studentName = student ? student.name : '';
+  let label: string = '';
   let puntuation: string;
   let deleteIt: boolean;
   let showDelete: boolean;
+  beforeUpdate(() => {
+    if (student && (!newStudent || newStudent.name !== student.name)) {
+      studentName = student.name;
+      newStudent = student;
+    }
+  });
 </script>
 
 <style>
@@ -80,8 +88,8 @@
         on:submit={() => {
           setEvent({ label: label, puntuaction: Number(puntuation) });
         }}>
-        <TextInput labelText="Label" bind:value={label} />
-        <NumberInput label="Puntuation" bind:value={puntuation} />
+        <TextInput labelText="Label" value={label} />
+        <NumberInput mobile label="Puntuation" bind:value={puntuation} />
         <Button type="submit">Submit</Button>
       </Form>
     </AccordionItem>
@@ -112,9 +120,9 @@
         <Form
           on:submit={e => {
             e.preventDefault();
-            editStudent(newStudent);
+            editStudent({ ...student, name: studentName });
           }}>
-          <TextInput labelText="Name" value={newStudent.name} />
+          <TextInput labelText="Name" value={studentName} />
           <ButtonSet>
             <Button
               kind="danger"
@@ -126,7 +134,7 @@
             <Button
               kind="secondary"
               on:click={() => {
-                newStudent = { ...student };
+                studentName = student.name;
               }}>
               Cancel
             </Button>

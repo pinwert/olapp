@@ -28,7 +28,7 @@
     JSON.parse(localStorage.getItem('positiveEvents')) || [];
   let negativeEvents: Array<IAction> =
     JSON.parse(localStorage.getItem('negativeEvents')) || [];
-  let sortBy: 'alphabetical' | 'more-point' | 'less-points' = 'alphabetical';
+  let sortBy: 'alphabetical' | 'more-points' | 'less-points' = 'alphabetical';
   afterUpdate(() => {
     localStorage.setItem('students', JSON.stringify(students));
     localStorage.setItem('groups', JSON.stringify(groups));
@@ -55,7 +55,6 @@
     showActions = s;
   };
   const setEvent = (event: IAction) => {
-    console.log('-----', showActions, event);
     showActions.forEach(st => {
       const idx = students.findIndex(s => s.id === st.id);
       if (idx > -1) {
@@ -108,6 +107,15 @@
       kind="secondary"
       on:click={() => setSelecteds(selecteds.length === studentsInGroup.length ? [] : (selecteds = studentsInGroup.map(s => s.id)))}>
       Select all
+    </Button>
+    <Button
+      kind="secondary"
+      on:click={() => onShowActions([studentsInGroup[((min, max) => {
+              min = Math.ceil(min);
+              max = Math.floor(max);
+              return Math.floor(Math.random() * (max - min + 1)) + min;
+            })(0, studentsInGroup.length - 1)]])}>
+      Select random
     </Button>
     {#if selecteds.length > 0}
       <Button
@@ -164,14 +172,17 @@
   {groups} />
 <CreateEvent
   open={modalToShow === 'showCreatePositive'}
+  title="Create positive event"
   {close}
   send={newEvent => {
+    console.log('----', [...positiveEvents, newEvent], newEvent);
     positiveEvents = [...positiveEvents, newEvent];
     modalToShow = '';
   }} />
 <CreateEvent
   open={modalToShow === 'showCreateNegative'}
   {close}
+  title="Create negative event"
   send={newEvent => {
     negativeEvents = [...negativeEvents, newEvent];
     modalToShow = '';

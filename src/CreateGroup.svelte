@@ -3,7 +3,7 @@
   export let send: (e: string) => void;
   export let open: boolean;
   export let close: () => void;
-  let groupName: string;
+  let groupName: string = '';
 </script>
 
 <style>
