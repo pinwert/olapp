@@ -29,7 +29,7 @@
     send(newEvent);
   }}>
   <Form>
-    <TextInput labelText="Label" value={label} />
-    <NumberInput mobile label="Puntuation" value={puntuaction} />
+    <TextInput labelText="Label" bind:value={label} />
+    <NumberInput mobile label="Puntuation" bind:value={puntuaction} />
   </Form>
 </Modal>

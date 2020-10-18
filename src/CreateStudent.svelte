@@ -42,6 +42,6 @@
         {/each}
       </Select>
     {/if}
-    <TextInput labelText="Name" value={name} />
+    <TextInput labelText="Name" bind:value={name} />
   </Form>
 </Modal>

@@ -73,13 +73,19 @@
     <AccordionItem>
       <div slot="title" class="positive">Positive</div>
       {#each positiveEvents as event}
-        <div class="event" on:click={() => setEvent(event)}>{event.label}</div>
+        <div class="event" on:click={() => setEvent(event)}>
+          {event.label}
+          ({event.puntuaction})
+        </div>
       {/each}
     </AccordionItem>
     <AccordionItem>
       <div slot="title" class="negative">Negative</div>
       {#each negativeEvents as event}
-        <div class="event" on:click={() => setEvent(event)}>{event.label}</div>
+        <div class="event" on:click={() => setEvent(event)}>
+          {event.label}
+          ({event.puntuaction})
+        </div>
       {/each}
     </AccordionItem>
     <AccordionItem>
@@ -88,7 +94,7 @@
         on:submit={() => {
           setEvent({ label: label, puntuaction: Number(puntuation) });
         }}>
-        <TextInput labelText="Label" value={label} />
+        <TextInput labelText="Label" bind:value={label} />
         <NumberInput mobile label="Puntuation" bind:value={puntuation} />
         <Button type="submit">Submit</Button>
       </Form>
@@ -120,9 +126,10 @@
         <Form
           on:submit={e => {
             e.preventDefault();
+            console.log(')', studentName);
             editStudent({ ...student, name: studentName });
           }}>
-          <TextInput labelText="Name" value={studentName} />
+          <TextInput labelText="Name" bind:value={studentName} />
           <ButtonSet>
             <Button
               kind="danger"

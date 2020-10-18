@@ -104,12 +104,12 @@
   {showModal}>
   <ButtonSet>
     <Button
-      kind="secondary"
+      kind="ghost"
       on:click={() => setSelecteds(selecteds.length === studentsInGroup.length ? [] : (selecteds = studentsInGroup.map(s => s.id)))}>
       Select all
     </Button>
     <Button
-      kind="secondary"
+      kind="ghost"
       on:click={() => onShowActions([studentsInGroup[((min, max) => {
               min = Math.ceil(min);
               max = Math.floor(max);
@@ -129,11 +129,14 @@
       inline
       labelText="Sort by:"
       bind:selected={sortBy}
-      style={'padding-left: 20px;'}>
+      style={'padding-left: 10px;'}>
       <SelectItem value="alphabetical" text="Alphabetical" />
       <SelectItem value="more-points" text="More points" />
       <SelectItem value="less-points" text="Less points" />
     </Select>
+    <Button kind="ghost" on:click={() => showModal('showCreateStudent')}>
+      New student
+    </Button>
   </ButtonSet>
   <StudentsTable
     students={studentsInGroup}

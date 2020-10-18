@@ -19,6 +19,6 @@
   on:click:button--secondary={close}
   on:submit={() => send(groupName)}>
   <Form>
-    <TextInput labelText="Create group:" value={groupName} />
+    <TextInput labelText="Create group:" bind:value={groupName} />
   </Form>
 </Modal>
