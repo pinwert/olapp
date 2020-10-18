@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Modal } from 'carbon-components-svelte';
   import type { IStudent } from './interfaces';
-  export let student: IStudent | undefined;
+  export let student: IStudent;
   export let close: () => void;
   export let open: boolean;
 </script>
@@ -24,12 +24,12 @@
   }
 </style>
 
-<Modal
-  {open}
-  passiveModal
-  modalHeading={`History for: ${student && student.name}`}
-  on:close={close}>
-  {#if student}
+{#if student}
+  <Modal
+    {open}
+    passiveModal
+    modalHeading={`History for: ${student.name}`}
+    on:close={close}>
     <table class="table">
       <thead>
         <tr>
@@ -62,5 +62,5 @@
         {/each}
       </tbody>
     </table>
-  {/if}
-</Modal>
+  </Modal>
+{/if}

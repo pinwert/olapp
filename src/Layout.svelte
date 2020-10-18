@@ -81,15 +81,22 @@
   <HeaderUtilities>
     <HeaderAction bind:isOpen>
       <HeaderPanelLinks>
-        <HeaderPanelDivider>Change group:</HeaderPanelDivider>
-        {#each groups as group}
-          <HeaderPanelLink
-            on:click={() => {
-              setGroupSelected(group);
-            }}>
-            {group}
-          </HeaderPanelLink>
-        {/each}
+        <HeaderPanelDivider>Create:</HeaderPanelDivider>
+        <HeaderPanelLink on:click={() => showModal('showCreateGroup')}>
+          New Group
+        </HeaderPanelLink>
+        <HeaderPanelLink on:click={() => showModal('showCreateStudent')}>
+          New Student
+        </HeaderPanelLink>
+        <HeaderPanelLink on:click={() => showModal('showCreatePositive')}>
+          New Positive
+        </HeaderPanelLink>
+        <HeaderPanelLink on:click={() => showModal('showCreateNegative')}>
+          New Negative
+        </HeaderPanelLink>
+        <HeaderPanelDivider>Export / Inport</HeaderPanelDivider>
+        <HeaderPanelLink on:click={exportData}>Export data</HeaderPanelLink>
+        <HeaderPanelLink on:click={inport}>Import data</HeaderPanelLink>
       </HeaderPanelLinks>
     </HeaderAction>
   </HeaderUtilities>
@@ -97,20 +104,13 @@
 
 <SideNav bind:isOpen={isSideNavOpen}>
   <SideNavItems>
-    <SideNavLink
-      text="Create Group"
-      on:click={() => showModal('showCreateGroup')} />
-    <SideNavLink
-      text="Create Student"
-      on:click={() => showModal('showCreateStudent')} />
-    <SideNavLink
-      text="Create Positive"
-      on:click={() => showModal('showCreatePositive')} />
-    <SideNavLink
-      text="Create Negative"
-      on:click={() => showModal('showCreateNegative')} />
-    <SideNavLink text="Export data" on:click={exportData} />
-    <SideNavLink text="Import data" on:click={inport} />
+    {#each groups as group}
+      <SideNavLink
+        text={group}
+        on:click={() => {
+          setGroupSelected(group);
+        }} />
+    {/each}
   </SideNavItems>
 </SideNav>
 

@@ -1,25 +1,50 @@
 <script lang="ts">
   import { Checkbox, Grid, Row, Tile, Column } from 'carbon-components-svelte';
+  import { beforeUpdate } from 'svelte';
 
   import type { IStudent } from './interfaces';
 
   export let students: Array<IStudent>;
+  export let sortBy: 'alphabetical' | 'more-points' | 'less-points';
   export let selecteds: Array<string>;
-  export let onShowHistory: (s: IStudent) => void;
   export let onShowActions: (s: Array<IStudent>) => void;
   export let setSelecteds: (s: Array<string>) => void;
-  export let onEditStudent: (s: IStudent) => void;
-  let sortedStudents = students.sort((a, b) => {
-    const nameA = a.name.toUpperCase();
-    const nameB = b.name.toUpperCase();
-    let comparison = 0;
-    if (nameA > nameB) {
-      comparison = 1;
-    } else if (nameA < nameB) {
-      comparison = -1;
-    }
-    return comparison;
-  });
+  $: sortedStudents =
+    sortBy &&
+    students.sort((a, b) => {
+      let comparison = 0;
+      switch (sortBy) {
+        case 'alphabetical':
+          const nameA = (a.name || '').toUpperCase();
+          const nameB = (b.name || '').toUpperCase();
+          if (nameA > nameB) {
+            comparison = 1;
+          } else if (nameA < nameB) {
+            comparison = -1;
+          }
+          return comparison;
+        case 'less-points':
+          if ((a.puntuation || 0) > (b.puntuation || 0)) {
+            comparison = 1;
+          } else if ((a.puntuation || 0) < (b.puntuation || 0)) {
+            comparison = -1;
+          }
+          return comparison;
+        case 'more-points':
+          if ((a.puntuation || 0) < (b.puntuation || 0)) {
+            comparison = 1;
+          } else if ((a.puntuation || 0) > (b.puntuation || 0)) {
+            comparison = -1;
+          }
+          return comparison;
+      }
+    });
+  beforeUpdate(() =>
+    console.log(
+      sortedStudents.map(s => s.puntuation),
+      sortBy
+    )
+  );
 </script>
 
 <style>
@@ -53,8 +78,11 @@
   <Row>
     {#each sortedStudents as student}
       <Column>
-        <div class="card" on:click={() => onShowActions([student])}>
-          <Tile light={selecteds.includes(student.id)}>
+        <div class="card">
+          <Tile
+            light={selecteds.includes(student.id)}
+            on:click={() => onShowActions([student])}
+            style="cursor: pointer;">
             <div class="row">
               <Checkbox
                 checked={selecteds.includes(student.id)}
@@ -70,31 +98,13 @@
                   }
                 }} />
               <div class="number">
-                {student.events.reduce((acc, s) => {
-                  acc = acc + s.puntuation;
-                  return acc;
-                }, 0)}
+                {student.puntuation || student.events.reduce((acc, s) => {
+                    acc = acc + s.puntuation;
+                    return acc;
+                  }, 0)}
               </div>
             </div>
             <div class="name">{student.name}</div>
-            <div class="row">
-              <div
-                on:click={e => {
-                  e.preventDefault();
-                  e.stopImmediatePropagation();
-                  onShowHistory(student);
-                }}>
-                View
-              </div>
-              <div
-                on:click={e => {
-                  e.preventDefault();
-                  e.stopImmediatePropagation();
-                  onEditStudent(student);
-                }}>
-                Edit
-              </div>
-            </div>
           </Tile>
         </div>
       </Column>

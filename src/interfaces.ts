@@ -15,4 +15,5 @@ export interface IStudent {
   group: string;
   disabled?: boolean;
   events: Array<IEvent>;
+  puntuation: number;
 }

@@ -1,6 +1,13 @@
 <script lang="ts">
   import type { IStudent } from './interfaces';
-  import { Modal } from 'carbon-components-svelte';
+  import {
+    Form,
+    Modal,
+    Select,
+    SelectItem,
+    TextInput,
+  } from 'carbon-components-svelte';
+  import { beforeUpdate } from 'svelte';
   export let send: (e: IStudent) => void;
   export let groups: Array<string>;
   export let close: () => void;
@@ -10,26 +17,6 @@
 </script>
 
 <style>
-  button {
-    padding: 7px 20px;
-    margin: 20px;
-    background-color: rgba(30, 130, 30, 1);
-    color: white;
-    border-radius: 6px;
-    align-self: flex-end;
-  }
-  select {
-    min-width: 100px;
-  }
-  form {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    min-width: 300px;
-  }
-  label {
-    padding: 20px 0 10px;
-  }
 </style>
 
 <Modal
@@ -40,25 +27,22 @@
   secondaryButtonText="Cancel"
   on:click:button--secondary={close}
   on:submit={() => {
-    send({ id: `${group}_${name}`, name: name, group: group, events: [] });
+    send({
+      id: `${name}_${new Date().getTime()}`,
+      name: name,
+      group: group,
+      events: [],
+      puntuation: 0,
+    });
   }}>
-  <form>
+  <Form>
     {#if groups.length}
-      <label for="group">Group:</label>
-      <select
-        name="group"
-        id="group"
-        on:blur={e => (group = e.currentTarget.value)}
-        on:change={e => (group = e.currentTarget.value)}>
+      <Select labelText="Group" bind:selected={group}>
         {#each groups as group}
-          <option value={group}>{group}</option>
+          <SelectItem value={group} text={group} />
         {/each}
-      </select>
+      </Select>
     {/if}
-    <label for="name">name:</label>
-    <input
-      name="name"
-      id="name"
-      on:change={e => (name = e.currentTarget.value)} />
-  </form>
+    <TextInput labelText="Name" bind:value={name} />
+  </Form>
 </Modal>

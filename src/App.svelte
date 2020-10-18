@@ -1,12 +1,16 @@
 <script lang="ts">
   import { afterUpdate } from 'svelte';
   import Actions from './Actions.svelte';
-  import { Button, ButtonSet } from 'carbon-components-svelte';
+  import {
+    Button,
+    ButtonSet,
+    Row,
+    SelectItem,
+    Select,
+  } from 'carbon-components-svelte';
   import CreateEvent from './CreateEvent.svelte';
   import CreateGroup from './CreateGroup.svelte';
   import CreateStudent from './CreateStudent.svelte';
-  import EditStudent from './EditStudent.svelte';
-  import History from './History.svelte';
   import type { IAction, IStudent } from './interfaces';
   import StudentsTable from './StudentsTable.svelte';
   import Layout from './Layout.svelte';
@@ -14,20 +18,17 @@
   let students: Array<IStudent> =
     JSON.parse(localStorage.getItem('students')) || [];
   let groups: Array<string> = JSON.parse(localStorage.getItem('groups')) || [];
-  let showHistory: IStudent;
   let showActions: Array<IStudent> = [];
   let selecteds: Array<string> = [];
-  let showEditStudent: IStudent;
   let modalToShow: string = !groups.length ? 'showCreateGroup' : '';
   let groupSelected =
     localStorage.getItem('groupSelected') || (groups.length && groups[0]) || '';
-  let studentsInGroup: Array<IStudent> = students.filter(
-    s => s.group === groupSelected
-  );
+  $: studentsInGroup = students.filter(s => s.group === groupSelected);
   let positiveEvents: Array<IAction> =
     JSON.parse(localStorage.getItem('positiveEvents')) || [];
   let negativeEvents: Array<IAction> =
     JSON.parse(localStorage.getItem('negativeEvents')) || [];
+  let sortBy: 'alphabetical' | 'more-point' | 'less-points' = 'alphabetical';
   afterUpdate(() => {
     localStorage.setItem('students', JSON.stringify(students));
     localStorage.setItem('groups', JSON.stringify(groups));
@@ -47,9 +48,6 @@
     positiveEvents = obj.positiveEvents;
     negativeEvents = obj.negativeEvents;
   };
-  const onShowHistory = student => {
-    showHistory = student;
-  };
   const setSelecteds = (s: Array<string>) => {
     selecteds = s;
   };
@@ -57,15 +55,22 @@
     showActions = s;
   };
   const setEvent = (event: IAction) => {
+    console.log('-----', showActions, event);
     showActions.forEach(st => {
       const idx = students.findIndex(s => s.id === st.id);
       if (idx > -1) {
-        students[idx].events.push({
-          eventType: event.label,
-          createdAt: new Date().getTime(),
-          puntuation: event.puntuaction,
-        });
-        students[idx].events = [...students[idx].events];
+        students[idx].events = [
+          ...students[idx].events,
+          {
+            eventType: event.label,
+            createdAt: new Date().getTime(),
+            puntuation: event.puntuaction,
+          },
+        ];
+        students[idx].puntuation = students[idx].events.reduce((acc, s) => {
+          acc = acc + s.puntuation;
+          return acc;
+        }, 0);
       }
     });
     showActions = [];
@@ -73,16 +78,16 @@
   const close = () => {
     modalToShow = '';
   };
-  const onEditStudent = (s: IStudent) => {
-    showEditStudent = s;
-  };
   const editStudent = (s: IStudent) => {
     const idx = students.findIndex(st => st.id === s.id);
     if (idx > -1) {
       students[idx] = s;
-      students = [...students];
     }
-    showEditStudent = undefined;
+    showActions = [];
+  };
+  const deleteStudent = (s: IStudent) => {
+    students = students.filter(st => st.id !== s.id);
+    showActions = [];
   };
 </script>
 
@@ -112,44 +117,48 @@
         Add event
       </Button>
     {/if}
+    <Select
+      inline
+      labelText="Sort by:"
+      bind:selected={sortBy}
+      style={'padding-left: 20px;'}>
+      <SelectItem value="alphabetical" text="Alphabetical" />
+      <SelectItem value="more-points" text="More points" />
+      <SelectItem value="less-points" text="Less points" />
+    </Select>
   </ButtonSet>
   <StudentsTable
     students={studentsInGroup}
-    {onShowHistory}
+    {sortBy}
     {selecteds}
     {setSelecteds}
-    {onShowActions}
-    {onEditStudent} />
+    {onShowActions} />
 </Layout>
 <CreateGroup
   {close}
   open={modalToShow === 'showCreateGroup'}
   send={group => {
-    groups.push(group);
-    groups = [...groups];
+    groups = [...groups, group];
     modalToShow = '';
   }} />
 <Actions
+  name={showActions.length && `${showActions[0].name} ${showActions.length > 1 ? `and ${showActions.length - 1} more` : ''}`}
   {positiveEvents}
   {negativeEvents}
   {setEvent}
   open={!!showActions.length}
+  student={showActions.length === 1 ? showActions[0] : undefined}
   close={() => {
     showActions = [];
-  }} />
-<History
-  open={!!showHistory}
-  student={showHistory}
-  close={() => {
-    showHistory = undefined;
-  }} />
+  }}
+  {editStudent}
+  {deleteStudent} />
 <CreateStudent
   open={modalToShow === 'showCreateStudent'}
   {close}
   group={groupSelected}
   send={newStudent => {
-    students.push(newStudent);
-    students = [...students];
+    students = [...students, newStudent];
     modalToShow = '';
   }}
   {groups} />
@@ -157,22 +166,13 @@
   open={modalToShow === 'showCreatePositive'}
   {close}
   send={newEvent => {
-    positiveEvents.push(newEvent);
-    positiveEvents = [...positiveEvents];
+    positiveEvents = [...positiveEvents, newEvent];
     modalToShow = '';
   }} />
 <CreateEvent
   open={modalToShow === 'showCreateNegative'}
   {close}
   send={newEvent => {
-    negativeEvents.push(newEvent);
-    negativeEvents = [...negativeEvents];
+    negativeEvents = [...negativeEvents, newEvent];
     modalToShow = '';
   }} />
-<EditStudent
-  open={!!showEditStudent}
-  close={() => {
-    showEditStudent = undefined;
-  }}
-  send={editStudent}
-  student={showEditStudent} />
