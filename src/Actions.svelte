@@ -1,8 +1,6 @@
 <script lang="ts">
   import type { IAction, IStudent } from './interfaces';
   import {
-    Accordion,
-    AccordionItem,
     Button,
     ButtonSet,
     DataTable,
@@ -11,6 +9,10 @@
     Form,
     Checkbox,
     Modal,
+    Tabs,
+    Tab,
+    TabContent,
+    Tile,
   } from 'carbon-components-svelte';
   import { beforeUpdate } from 'svelte';
   export let name: string;
@@ -37,24 +39,6 @@
 </script>
 
 <style>
-  .positive {
-    background-color: rgba(23, 150, 23);
-    color: white;
-    padding: 20px;
-    border-radius: 6px;
-  }
-  .negative {
-    background-color: rgba(150, 23, 23);
-    color: white;
-    padding: 20px;
-    border-radius: 6px;
-  }
-  .comment {
-    background-color: rgba(23, 23, 23, 0.3);
-    color: white;
-    padding: 20px;
-    border-radius: 6px;
-  }
   .event {
     border-radius: 6px;
     background-color: rgba(23, 23, 23, 0.3);
@@ -64,110 +48,129 @@
   }
 </style>
 
-<Modal
-  {open}
-  modalHeading={`Set event: ${name || ''}`}
-  on:close={close}
-  passiveModal>
-  <Accordion>
-    <AccordionItem>
-      <div slot="title" class="positive">Positive</div>
-      {#each positiveEvents as event}
-        <div class="event" on:click={() => setEvent(event)}>
-          {event.label}
-          ({event.puntuaction})
-        </div>
-      {/each}
-    </AccordionItem>
-    <AccordionItem>
-      <div slot="title" class="negative">Negative</div>
-      {#each negativeEvents as event}
-        <div class="event" on:click={() => setEvent(event)}>
-          {event.label}
-          ({event.puntuaction})
-        </div>
-      {/each}
-    </AccordionItem>
-    <AccordionItem>
-      <div slot="title" class="comment">Add comment</div>
-      <Form
-        on:submit={() => {
-          setEvent({ label: label, puntuaction: Number(puntuation) });
-        }}>
-        <TextInput labelText="Label" bind:value={label} />
-        <NumberInput mobile label="Puntuation" bind:value={puntuation} />
-        <Button type="submit">Submit</Button>
-      </Form>
-    </AccordionItem>
-    {#if student}
-      {#if student.events.length}
-        <AccordionItem>
-          <div slot="title" class="comment">History</div>
-          <DataTable
-            sortable
-            headers={[{ key: 'eventType', value: 'Event' }, { key: 'createdAt', value: 'Date' }, { key: 'puntuation', value: 'Puntuation' }]}
-            rows={student.events.map((s, idx) => ({ ...s, createdAt: (() => {
-                const d = new Date(s.createdAt);
-                const ye = new Intl.DateTimeFormat('en', {
-                  year: 'numeric',
-                }).format(d);
-                const mo = new Intl.DateTimeFormat('en', {
-                  month: 'short',
-                }).format(d);
-                const da = new Intl.DateTimeFormat('en', {
-                  day: '2-digit',
-                }).format(d);
-                return `${da}-${mo}-${ye}`;
-              })(), id: idx }))} />
-        </AccordionItem>
+{#if open}
+  <Modal
+    size="lg"
+    {open}
+    modalHeading={`Set event: ${name || ''}`}
+    on:close={close}
+    passiveModal>
+    <Tabs type="container">
+      <Tab
+        label="Add positive"
+        style="background-color: rgba(23, 150, 23,0.3);" />
+      <Tab
+        label="Add negative"
+        style="background-color: rgba(150, 23, 23,0.3);" />
+      <Tab label="Add comment" />
+      {#if student}
+        {#if student.events.length}
+          <Tab label="History" />
+        {/if}
+        <Tab label="Edit" />
       {/if}
-      <AccordionItem>
-        <div slot="title" class="comment">Edit</div>
-        <Form
-          on:submit={e => {
-            e.preventDefault();
-            console.log(')', studentName);
-            editStudent({ ...student, name: studentName });
-          }}>
-          <TextInput labelText="Name" bind:value={studentName} />
-          <ButtonSet>
-            <Button
-              kind="danger"
-              on:click={() => {
-                showDelete = true;
+      <div slot="content">
+        <TabContent>
+          {#each positiveEvents as event}
+            <div class="event" on:click={() => setEvent(event)}>
+              {event.label}
+              ({event.puntuaction})
+            </div>
+          {/each}
+        </TabContent>
+        <TabContent>
+          {#each negativeEvents as event}
+            <div class="event" on:click={() => setEvent(event)}>
+              {event.label}
+              ({event.puntuaction})
+            </div>
+          {/each}
+        </TabContent>
+        <TabContent>
+          <Form
+            on:submit={() => {
+              setEvent({ label: label, puntuaction: Number(puntuation) });
+            }}>
+            <TextInput labelText="Label" bind:value={label} />
+            <NumberInput mobile label="Puntuation" bind:value={puntuation} />
+            <ButtonSet style="padding-top: 10px;">
+              <Button type="submit">Submit</Button>
+            </ButtonSet>
+          </Form>
+        </TabContent>
+        {#if student}
+          {#if student.events.length}
+            <TabContent>
+              <DataTable
+                sortable
+                headers={[{ key: 'eventType', value: 'Event' }, { key: 'createdAt', value: 'Date' }, { key: 'puntuation', value: 'Puntuation' }]}
+                rows={student.events.map((s, idx) => ({
+                  ...s,
+                  createdAt: (() => {
+                    const d = new Date(s.createdAt);
+                    const ye = new Intl.DateTimeFormat('en', {
+                      year: 'numeric',
+                    }).format(d);
+                    const mo = new Intl.DateTimeFormat('en', {
+                      month: 'short',
+                    }).format(d);
+                    const da = new Intl.DateTimeFormat('en', {
+                      day: '2-digit',
+                    }).format(d);
+                    return `${da}-${mo}-${ye}`;
+                  })(),
+                  id: idx,
+                }))} />
+            </TabContent>
+          {/if}
+          <TabContent>
+            <Form
+              on:submit={e => {
+                e.preventDefault();
+                console.log(')', studentName);
+                editStudent({ ...student, name: studentName });
               }}>
-              Delete
-            </Button>
-            <Button
-              kind="secondary"
-              on:click={() => {
-                studentName = student.name;
-              }}>
-              Cancel
-            </Button>
-            <Button type="submit">Save</Button>
-          </ButtonSet>
-        </Form>
-      </AccordionItem>
-    {/if}
-  </Accordion>
-</Modal>
+              <TextInput labelText="Name" bind:value={studentName} />
+              <ButtonSet>
+                <Button
+                  kind="danger"
+                  on:click={() => {
+                    showDelete = true;
+                  }}>
+                  Delete
+                </Button>
+                <Button
+                  kind="secondary"
+                  on:click={() => {
+                    studentName = student.name;
+                  }}>
+                  Cancel
+                </Button>
+                <Button type="submit">Save</Button>
+              </ButtonSet>
+            </Form>
+          </TabContent>
+        {/if}
+      </div>
+    </Tabs>
+  </Modal>
 
-<Modal
-  open={showDelete}
-  modalHeading={`Confirm delete: ${name || ''}`}
-  on:submit={() => {
-    showDelete = false;
-    deleteStudent(student);
-  }}
-  on:close={() => {
-    showDelete = false;
-  }}
-  secondaryButtonText="Cancel"
-  on:click:button--secondary={() => {
-    showDelete = false;
-  }}
-  primaryButtonText="Proceed"
-  primaryButtonDisabled={!deleteIt}>
-  <Checkbox labelText="I am sure to delete it" bind:checked={deleteIt} />
-</Modal>
+  <Modal
+    open={showDelete}
+    modalHeading={`Confirm delete: ${name || ''}`}
+    on:submit={() => {
+      showDelete = false;
+      deleteStudent(student);
+    }}
+    on:close={() => {
+      showDelete = false;
+    }}
+    secondaryButtonText="Cancel"
+    on:click:button--secondary={() => {
+      showDelete = false;
+    }}
+    primaryButtonText="Proceed"
+    primaryButtonDisabled={!deleteIt}>
+    <Checkbox labelText="I am sure to delete it" bind:checked={deleteIt} />
+  </Modal>
+{/if}

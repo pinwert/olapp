@@ -106,7 +106,7 @@
     <Button
       kind="ghost"
       on:click={() => setSelecteds(selecteds.length === studentsInGroup.length ? [] : (selecteds = studentsInGroup.map(s => s.id)))}>
-      Select all
+      {selecteds.length === studentsInGroup.length ? 'Unselect all' : 'Select all'}
     </Button>
     <Button
       kind="ghost"
