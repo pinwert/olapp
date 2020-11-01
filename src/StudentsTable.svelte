@@ -1,14 +1,10 @@
 <script lang="ts">
   import { Checkbox, Grid, Row, Tile, Column } from 'carbon-components-svelte';
-  import { beforeUpdate } from 'svelte';
-
   import type { IStudent } from './interfaces';
 
+  import { selecteds, session, showActions } from './store';
   export let students: Array<IStudent>;
   export let sortBy: 'alphabetical' | 'more-points' | 'less-points';
-  export let selecteds: Array<string>;
-  export let onShowActions: (s: Array<IStudent>) => void;
-  export let setSelecteds: (s: Array<string>) => void;
   $: sortedStudents =
     sortBy &&
     students.sort((a, b) => {
@@ -66,6 +62,21 @@
     font-size: 20px;
     font-weight: 500;
   }
+  .flags {
+    position: absolute;
+    top: 0px;
+    right: -7px;
+    display: flex;
+    flex-direction: column;
+  }
+  .flag {
+    background-color: var(--color);
+    border-radius: 50%;
+    width: 15px;
+    height: 15px;
+    margin-bottom: 3px;
+    box-shadow: 1px 1px grey;
+  }
 </style>
 
 <Grid fullWidth noGutter>
@@ -74,24 +85,31 @@
       <Column>
         <div class="card">
           <Tile
-            light={selecteds.includes(student.id)}
-            on:click={() => onShowActions([student])}
+            light={$selecteds.includes(student.id)}
+            on:click={() => showActions.set([student])}
             style="cursor: pointer;">
             <div class="row">
               <Checkbox
                 style="padding: 10px"
-                checked={selecteds.includes(student.id)}
+                checked={$selecteds.includes(student.id)}
                 on:click={e => {
                   e.stopPropagation();
                   e.preventDefault();
-                  if (!selecteds.includes(student.id)) {
-                    setSelecteds([...selecteds, student.id]);
+                  if (!$selecteds.includes(student.id)) {
+                    selecteds.set([...$selecteds, student.id]);
                   } else {
-                    const idx = selecteds.indexOf(student.id);
-                    if (idx > -1) selecteds.splice(idx, 1);
-                    setSelecteds([...selecteds]);
+                    const idx = $selecteds.indexOf(student.id);
+                    if (idx > -1) $selecteds.splice(idx, 1);
+                    selecteds.set([...$selecteds]);
                   }
                 }} />
+              {#if $session[student.id]}
+                <div class="flags">
+                  {#each $session[student.id] as color}
+                    <div class="flag" style="--color: {color};" />
+                  {/each}
+                </div>
+              {/if}
               <div class="number">
                 {student.puntuation || student.events.reduce((acc, s) => {
                     acc = acc + s.puntuation;

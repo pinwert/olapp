@@ -7,6 +7,7 @@
     SelectItem,
     TextInput,
   } from 'carbon-components-svelte';
+  import { _ } from 'svelte-intl';
   export let send: (e: IStudent) => void;
   export let groups: Array<string>;
   export let close: () => void;
@@ -20,10 +21,10 @@
 
 <Modal
   {open}
-  modalHeading="Create student"
+  modalHeading={$_('create_student')}
   on:close={close}
-  primaryButtonText="Confirm"
-  secondaryButtonText="Cancel"
+  primaryButtonText={$_('confirm')}
+  secondaryButtonText={$_('cancel')}
   on:click:button--secondary={close}
   on:submit={() => {
     send({
@@ -36,12 +37,12 @@
   }}>
   <Form>
     {#if groups.length}
-      <Select labelText="Group" bind:selected={group}>
+      <Select labelText={$_('group')} bind:selected={group}>
         {#each groups as group}
           <SelectItem value={group} text={group} />
         {/each}
       </Select>
     {/if}
-    <TextInput labelText="Name" bind:value={name} />
+    <TextInput labelText={$_('name')} bind:value={name} />
   </Form>
 </Modal>

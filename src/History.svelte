@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Modal } from 'carbon-components-svelte';
+  import { _ } from 'svelte-intl';
   import type { IStudent } from './interfaces';
   export let student: IStudent;
   export let close: () => void;
@@ -28,14 +29,14 @@
   <Modal
     {open}
     passiveModal
-    modalHeading={`History for: ${student.name}`}
+    modalHeading={$_(`history_for_name`, { name: student.name })}
     on:close={close}>
     <table class="table">
       <thead>
         <tr>
-          <th>event</th>
-          <th>date</th>
-          <th>Punctuation</th>
+          <th>{$_('event')}</th>
+          <th>{$_('date')}</th>
+          <th>{$_('puntuation')}</th>
         </tr>
       </thead>
       <tbody>

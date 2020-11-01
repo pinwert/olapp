@@ -12,16 +12,18 @@
     Tabs,
     Tab,
     TabContent,
-    Tile,
   } from 'carbon-components-svelte';
+  import {
+    showActions,
+    students,
+    negativeEvents,
+    positiveEvents,
+  } from './store';
   import { beforeUpdate } from 'svelte';
+  import { _ } from 'svelte-intl';
   export let name: string;
   export let student: IStudent;
   export let setEvent: (e: IAction) => void;
-  export let editStudent: (e: IStudent) => void;
-  export let deleteStudent: (e: IStudent) => void;
-  export let positiveEvents: Array<IAction>;
-  export let negativeEvents: Array<IAction>;
   export let close: () => void;
   export let open: boolean;
   let newStudent = student;
@@ -30,6 +32,18 @@
   let puntuation: string;
   let deleteIt: boolean;
   let showDelete: boolean;
+  const editStudent = (s: IStudent) => {
+    const idx = $students.findIndex(st => st.id === s.id);
+    if (idx > -1) {
+      $students[idx] = s;
+      students.set($students);
+    }
+    showActions.set([]);
+  };
+  const deleteStudent = (s: IStudent) => {
+    students.set($students.filter(st => st.id !== s.id));
+    showActions.set([]);
+  };
   beforeUpdate(() => {
     if (student && (!newStudent || newStudent.name !== student.name)) {
       studentName = student.name;
@@ -52,26 +66,26 @@
   <Modal
     size="lg"
     {open}
-    modalHeading={`Set event: ${name || ''}`}
+    modalHeading={$_('set_event', { name: name || '' })}
     on:close={close}
     passiveModal>
     <Tabs type="container">
       <Tab
-        label="Add positive"
+        label={$_('add_positive')}
         style="background-color: rgba(23, 150, 23,0.3);" />
       <Tab
-        label="Add negative"
+        label={$_('add_negative')}
         style="background-color: rgba(150, 23, 23,0.3);" />
-      <Tab label="Add comment" />
+      <Tab label={$_('add_comment')} />
       {#if student}
         {#if student.events.length}
-          <Tab label="History" />
+          <Tab label={$_('history')} />
         {/if}
-        <Tab label="Edit" />
+        <Tab label={$_('edit')} />
       {/if}
       <div slot="content">
         <TabContent>
-          {#each positiveEvents as event}
+          {#each $positiveEvents as event}
             <div class="event" on:click={() => setEvent(event)}>
               {event.label}
               ({event.puntuaction})
@@ -79,7 +93,7 @@
           {/each}
         </TabContent>
         <TabContent>
-          {#each negativeEvents as event}
+          {#each $negativeEvents as event}
             <div class="event" on:click={() => setEvent(event)}>
               {event.label}
               ({event.puntuaction})
@@ -127,7 +141,6 @@
             <Form
               on:submit={e => {
                 e.preventDefault();
-                console.log(')', studentName);
                 editStudent({ ...student, name: studentName });
               }}>
               <TextInput labelText="Name" bind:value={studentName} />
