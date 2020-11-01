@@ -1,6 +1,7 @@
 <script lang="ts">
   export let inportData: (obj: {}) => void;
   import { Button } from 'carbon-components-svelte';
+  import { _ } from 'svelte-intl';
 
   function inport() {
     let element = document.createElement('input');
@@ -26,4 +27,4 @@
 <style>
 </style>
 
-<Button on:click={inport}>Import data</Button>
+<Button on:click={inport}>{$_('import_data')}</Button>

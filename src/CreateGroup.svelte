@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Form, Modal, TextInput } from 'carbon-components-svelte';
+  import { _ } from 'svelte-intl';
   export let send: (e: string) => void;
   export let open: boolean;
   export let close: () => void;
@@ -11,14 +12,14 @@
 
 <Modal
   size="xs"
-  modalHeading="Create group"
+  modalHeading={$_('create_group')}
   on:close={close}
   {open}
-  primaryButtonText="Confirm"
-  secondaryButtonText="Cancel"
+  primaryButtonText={$_('confirm')}
+  secondaryButtonText={$_('cancel')}
   on:click:button--secondary={close}
   on:submit={() => send(groupName)}>
   <Form>
-    <TextInput labelText="Create group:" bind:value={groupName} />
+    <TextInput labelText={$_('create_group') + ':'} bind:value={groupName} />
   </Form>
 </Modal>

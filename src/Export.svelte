@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { IAction, IStudent } from './interfaces';
   import { Button } from 'carbon-components-svelte';
+  import { _ } from 'svelte-intl';
 
   export let students: Array<IStudent>;
   export let groups: Array<string>;
@@ -35,4 +36,4 @@
 <style>
 </style>
 
-<Button on:click={exportData}>Export data</Button>
+<Button on:click={exportData}>{$_('export_data')}</Button>

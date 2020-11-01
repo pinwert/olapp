@@ -1,192 +1,157 @@
 <script lang="ts">
-  import { afterUpdate } from 'svelte';
+  import './translations';
+  import { _ } from 'svelte-intl';
   import Actions from './Actions.svelte';
   import {
     Button,
     ButtonSet,
-    Row,
     SelectItem,
     Select,
   } from 'carbon-components-svelte';
   import CreateEvent from './CreateEvent.svelte';
   import CreateGroup from './CreateGroup.svelte';
   import CreateStudent from './CreateStudent.svelte';
-  import type { IAction, IStudent } from './interfaces';
+  import type { IAction } from './interfaces';
   import StudentsTable from './StudentsTable.svelte';
   import Layout from './Layout.svelte';
+  import EditEvent from './EditEvent.svelte';
+  import {
+    groups,
+    groupSelected,
+    negativeEvents,
+    positiveEvents,
+    selecteds,
+    session,
+    showActions,
+    students,
+  } from './store';
 
-  let students: Array<IStudent> =
-    JSON.parse(localStorage.getItem('students')) || [];
-  let groups: Array<string> = JSON.parse(localStorage.getItem('groups')) || [];
-  let showActions: Array<IStudent> = [];
-  let selecteds: Array<string> = [];
-  let modalToShow: string = !groups.length ? 'showCreateGroup' : '';
-  let groupSelected =
-    localStorage.getItem('groupSelected') || (groups.length && groups[0]) || '';
-  $: studentsInGroup = students.filter(s => s.group === groupSelected);
-  let positiveEvents: Array<IAction> =
-    JSON.parse(localStorage.getItem('positiveEvents')) || [];
-  let negativeEvents: Array<IAction> =
-    JSON.parse(localStorage.getItem('negativeEvents')) || [];
+  let modalToShow: string = !$groups.length ? 'showCreateGroup' : '';
+  $: studentsInGroup = $students.filter(s => s.group === $groupSelected);
   let sortBy: 'alphabetical' | 'more-points' | 'less-points' = 'alphabetical';
-  afterUpdate(() => {
-    localStorage.setItem('students', JSON.stringify(students));
-    localStorage.setItem('groups', JSON.stringify(groups));
-    localStorage.setItem('groupSelected', groupSelected);
-    localStorage.setItem('positiveEvents', JSON.stringify(positiveEvents));
-    localStorage.setItem('negativeEvents', JSON.stringify(negativeEvents));
-  });
   const showModal = (m: string) => {
     modalToShow = m;
   };
-  const setGroupSelected = g => {
-    groupSelected = g;
-  };
-  const inportData = obj => {
-    students = obj.students;
-    groups = obj.groups;
-    positiveEvents = obj.positiveEvents;
-    negativeEvents = obj.negativeEvents;
-  };
-  const setSelecteds = (s: Array<string>) => {
-    selecteds = s;
-  };
-  const onShowActions = (s: Array<IStudent>) => {
-    showActions = s;
-  };
   const setEvent = (event: IAction) => {
-    showActions.forEach(st => {
-      const idx = students.findIndex(s => s.id === st.id);
+    $showActions.forEach(st => {
+      const idx = $students.findIndex(s => s.id === st.id);
       if (idx > -1) {
-        students[idx].events = [
-          ...students[idx].events,
+        $students[idx].events = [
+          ...$students[idx].events,
           {
             eventType: event.label,
             createdAt: new Date().getTime(),
             puntuation: event.puntuaction,
           },
         ];
-        students[idx].puntuation = students[idx].events.reduce((acc, s) => {
+        if (
+          event.color &&
+          (!$session[st.id] || !$session[st.id].includes(event.color))
+        ) {
+          $session[st.id] = [...($session[st.id] || []), event.color];
+        }
+
+        $students[idx].puntuation = $students[idx].events.reduce((acc, s) => {
           acc = acc + s.puntuation;
           return acc;
         }, 0);
+
+        students.set($students);
+        session.set($session);
       }
     });
-    showActions = [];
+    showActions.set([]);
   };
   const close = () => {
     modalToShow = '';
   };
-  const editStudent = (s: IStudent) => {
-    const idx = students.findIndex(st => st.id === s.id);
-    if (idx > -1) {
-      students[idx] = s;
-    }
-    showActions = [];
+  const randomIndex = (min, max) => {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
   };
-  const deleteStudent = (s: IStudent) => {
-    students = students.filter(st => st.id !== s.id);
-    showActions = [];
+  const selectRandom = () => {
+    const idx = randomIndex(
+      0,
+      $selecteds.length ? $selecteds.length - 1 : studentsInGroup.length - 1
+    );
+    const student = $selecteds.length
+      ? studentsInGroup.find(s => s.id === $selecteds[idx])
+      : studentsInGroup[idx];
+    showActions.set([student]);
   };
 </script>
 
 <style>
 </style>
 
-<Layout
-  {inportData}
-  {setGroupSelected}
-  {groupSelected}
-  {groups}
-  {students}
-  {positiveEvents}
-  {negativeEvents}
-  {showModal}>
+<Layout {showModal}>
   <ButtonSet>
     <Button
       kind="ghost"
-      on:click={() => setSelecteds(selecteds.length === studentsInGroup.length ? [] : (selecteds = studentsInGroup.map(s => s.id)))}>
-      {selecteds.length === studentsInGroup.length ? 'Unselect all' : 'Select all'}
+      on:click={() => selecteds.set($selecteds.length === studentsInGroup.length ? [] : studentsInGroup.map(s => s.id))}>
+      {$selecteds.length === studentsInGroup.length ? $_('unselect_all') : $_('select_all')}
     </Button>
-    <Button
-      kind="ghost"
-      on:click={() => onShowActions([studentsInGroup[((min, max) => {
-              min = Math.ceil(min);
-              max = Math.floor(max);
-              return Math.floor(Math.random() * (max - min + 1)) + min;
-            })(0, studentsInGroup.length - 1)]])}>
-      Select random
-    </Button>
-    {#if selecteds.length > 0}
+    <Button kind="ghost" on:click={selectRandom}>{$_('select_random')}</Button>
+    {#if $selecteds.length > 0}
       <Button
-        on:click={() => onShowActions(selecteds.map(s =>
+        on:click={() => showActions.set($selecteds.map(s =>
               studentsInGroup.find(st => st.id === s)
             ))}>
-        Add event
+        {$_('add_event')}
       </Button>
     {/if}
     <Select
       inline
-      labelText="Sort by:"
+      labelText={$_('sort_by')}
       bind:selected={sortBy}
       style={'padding-left: 10px;'}>
-      <SelectItem value="alphabetical" text="Alphabetical" />
-      <SelectItem value="more-points" text="More points" />
-      <SelectItem value="less-points" text="Less points" />
+      <SelectItem value="alphabetical" text={$_('alphabetical')} />
+      <SelectItem value="more-points" text={$_('more_points')} />
+      <SelectItem value="less-points" text={$_('less_points')} />
     </Select>
     <Button kind="ghost" on:click={() => showModal('showCreateStudent')}>
-      New student
+      {$_('new_student')}
     </Button>
   </ButtonSet>
-  <StudentsTable
-    students={studentsInGroup}
-    {sortBy}
-    {selecteds}
-    {setSelecteds}
-    {onShowActions} />
+  <StudentsTable students={studentsInGroup} {sortBy} />
 </Layout>
 <CreateGroup
   {close}
   open={modalToShow === 'showCreateGroup'}
   send={group => {
-    groups = [...groups, group];
+    groups.set([...$groups, group]);
     modalToShow = '';
   }} />
 <Actions
-  name={showActions.length && `${showActions[0].name} ${showActions.length > 1 ? `and ${showActions.length - 1} more` : ''}`}
-  {positiveEvents}
-  {negativeEvents}
+  name={$showActions.length && `${$showActions[0].name} ${$showActions.length > 1 ? `and ${$showActions.length - 1} more` : ''}`}
   {setEvent}
-  open={!!showActions.length}
-  student={showActions.length === 1 ? showActions[0] : undefined}
+  open={!!$showActions.length}
+  student={$showActions.length === 1 ? $showActions[0] : undefined}
   close={() => {
-    showActions = [];
-  }}
-  {editStudent}
-  {deleteStudent} />
+    showActions.set([]);
+  }} />
 <CreateStudent
   open={modalToShow === 'showCreateStudent'}
   {close}
-  group={groupSelected}
+  group={$groupSelected}
   send={newStudent => {
-    students = [...students, newStudent];
+    students.set([...$students, newStudent]);
     modalToShow = '';
   }}
-  {groups} />
+  groups={$groups} />
 <CreateEvent
-  open={modalToShow === 'showCreatePositive'}
-  title="Create positive event"
+  event={undefined}
+  open={modalToShow === 'showCreateEvent'}
   {close}
+  title={$_('create_event')}
   send={newEvent => {
-    console.log('----', [...positiveEvents, newEvent], newEvent);
-    positiveEvents = [...positiveEvents, newEvent];
+    if (newEvent.puntuaction < 0) {
+      negativeEvents.set([...$negativeEvents, newEvent]);
+    } else {
+      positiveEvents.set([...$positiveEvents, newEvent]);
+    }
     modalToShow = '';
   }} />
-<CreateEvent
-  open={modalToShow === 'showCreateNegative'}
-  {close}
-  title="Create negative event"
-  send={newEvent => {
-    negativeEvents = [...negativeEvents, newEvent];
-    modalToShow = '';
-  }} />
+
+<EditEvent open={modalToShow === 'showEditEvent'} {close} />

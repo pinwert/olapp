@@ -1,6 +1,6 @@
 <script lang="ts">
-  import type { IAction, IStudent } from './interfaces';
   import {
+    Button,
     Header,
     HeaderUtilities,
     HeaderAction,
@@ -16,13 +16,20 @@
     Row,
     Column,
   } from 'carbon-components-svelte';
+  import { _ } from 'svelte-intl';
+  import {
+    groups,
+    groupSelected,
+    negativeEvents,
+    positiveEvents,
+    session,
+    students,
+  } from './store';
 
   let isSideNavOpen = false;
   let isOpen = false;
-  export let inportData: (obj: {}) => void;
+
   export let showModal: (m: string) => void;
-  export let setGroupSelected: (g: string) => void;
-  export let groupSelected: string;
 
   function inport() {
     let element = document.createElement('input');
@@ -44,21 +51,22 @@
     };
   }
 
-  export let students: Array<IStudent>;
-  export let groups: Array<string>;
-
-  export let positiveEvents: Array<IAction>;
-  export let negativeEvents: Array<IAction>;
+  const inportData = obj => {
+    students.set(obj.students);
+    groups.set(obj.groups);
+    positiveEvents.set(obj.positiveEvents);
+    negativeEvents.set(obj.negativeEvents);
+  };
 
   function exportData() {
     var dataUri =
       'data:application/json;charset=utf-8,' +
       encodeURIComponent(
         JSON.stringify({
-          students,
-          groups,
-          positiveEvents,
-          negativeEvents,
+          students: $students,
+          groups: $groups,
+          positiveEvents: $positiveEvents,
+          negativeEvents: $negativeEvents,
         })
       );
     let element = document.createElement('a');
@@ -74,29 +82,33 @@
   }
 </script>
 
-<Header company="OLAPP" platformName={groupSelected} bind:isSideNavOpen>
+<Header company="OLAPP" platformName={$groupSelected} bind:isSideNavOpen>
   <div slot="skip-to-content">
     <SkipToContent />
   </div>
   <HeaderUtilities>
     <HeaderAction bind:isOpen>
       <HeaderPanelLinks>
-        <HeaderPanelDivider>Create:</HeaderPanelDivider>
+        <HeaderPanelDivider>{$_('create')}:</HeaderPanelDivider>
         <HeaderPanelLink on:click={() => showModal('showCreateGroup')}>
-          New Group
+          {$_('new_group')}
         </HeaderPanelLink>
         <HeaderPanelLink on:click={() => showModal('showCreateStudent')}>
-          New Student
+          {$_('new_student')}
         </HeaderPanelLink>
-        <HeaderPanelLink on:click={() => showModal('showCreatePositive')}>
-          New Positive
+        <HeaderPanelLink on:click={() => showModal('showCreateEvent')}>
+          {$_('new_event')}
         </HeaderPanelLink>
-        <HeaderPanelLink on:click={() => showModal('showCreateNegative')}>
-          New Negative
+        <HeaderPanelDivider>{$_('edit')}:</HeaderPanelDivider>
+        <HeaderPanelLink on:click={() => showModal('showEditEvent')}>
+          {$_('edit_event')}
         </HeaderPanelLink>
-        <HeaderPanelDivider>Export / Inport</HeaderPanelDivider>
-        <HeaderPanelLink on:click={exportData}>Export data</HeaderPanelLink>
-        <HeaderPanelLink on:click={inport}>Import data</HeaderPanelLink>
+
+        <HeaderPanelDivider>{$_('export_inport')}</HeaderPanelDivider>
+        <HeaderPanelLink on:click={exportData}>
+          {$_('export_data')}
+        </HeaderPanelLink>
+        <HeaderPanelLink on:click={inport}>{$_('import_data')}</HeaderPanelLink>
       </HeaderPanelLinks>
     </HeaderAction>
   </HeaderUtilities>
@@ -104,13 +116,16 @@
 
 <SideNav bind:isOpen={isSideNavOpen}>
   <SideNavItems>
-    {#each groups as group}
+    {#each $groups as group}
       <SideNavLink
         text={group}
         on:click={() => {
-          setGroupSelected(group);
+          groupSelected.set(group);
         }} />
     {/each}
+    <Button kind="ghost" on:click={() => session.set({})}>
+      {$_('clean_session')}
+    </Button>
   </SideNavItems>
 </SideNav>
 
