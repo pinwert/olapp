@@ -26,6 +26,7 @@
   export let setEvent: (e: IAction) => void;
   export let close: () => void;
   export let open: boolean;
+  export let maxByGroup: number;
   let newStudent = student;
   let studentName = student ? student.name : '';
   let label: string = '';
@@ -44,10 +45,20 @@
     students.set($students.filter(st => st.id !== s.id));
     showActions.set([]);
   };
+
+  let positive = student
+    ? student.events.filter(e => e.puntuation >= 0).length /
+      student.events.length
+    : 0;
+  let ponderated = student ? student.puntuation / maxByGroup : 0;
   beforeUpdate(() => {
     if (student && (!newStudent || newStudent.name !== student.name)) {
       studentName = student.name;
       newStudent = student;
+      positive =
+        student.events.filter(e => e.puntuation >= 0).length /
+        student.events.length;
+      ponderated = student.puntuation / maxByGroup;
     }
   });
 </script>
@@ -69,6 +80,16 @@
     modalHeading={$_('set_event', { name: name || '' })}
     on:close={close}
     passiveModal>
+    <div class="row">
+      Puntuation:
+      {student.puntuation}
+      Calculated:
+      {((positive + ponderated) / 2).toFixed(2)}
+      Positive:
+      {positive.toFixed(2)}
+      Ponderated:
+      {ponderated.toFixed(2)}
+    </div>
     <Tabs type="container">
       <Tab
         label={$_('add_positive')}

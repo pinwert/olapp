@@ -11,7 +11,7 @@
   import CreateEvent from './CreateEvent.svelte';
   import CreateGroup from './CreateGroup.svelte';
   import CreateStudent from './CreateStudent.svelte';
-  import type { IAction } from './interfaces';
+  import type { IAction, IStudent } from './interfaces';
   import StudentsTable from './StudentsTable.svelte';
   import Layout from './Layout.svelte';
   import EditEvent from './EditEvent.svelte';
@@ -80,6 +80,10 @@
       : studentsInGroup[idx];
     showActions.set([student]);
   };
+  $: maxByGroup = studentsInGroup.reduce((ac: number, s: IStudent) => {
+    if (s.puntuation > ac) return s.puntuation;
+    return ac;
+  }, 0);
 </script>
 
 <style>
@@ -128,6 +132,7 @@
   {setEvent}
   open={!!$showActions.length}
   student={$showActions.length === 1 ? $showActions[0] : undefined}
+  {maxByGroup}
   close={() => {
     showActions.set([]);
   }} />
