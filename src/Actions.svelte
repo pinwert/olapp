@@ -48,17 +48,17 @@
 
   let positive = student
     ? student.events.filter(e => e.puntuation >= 0).length /
-      student.events.length
+        student.events.length || 0
     : 0;
-  let ponderated = student ? student.puntuation / maxByGroup : 0;
+  let ponderated = student ? student.puntuation / maxByGroup || 0 : 0;
   beforeUpdate(() => {
     if (student && (!newStudent || newStudent.name !== student.name)) {
       studentName = student.name;
       newStudent = student;
       positive =
         student.events.filter(e => e.puntuation >= 0).length /
-        student.events.length;
-      ponderated = student.puntuation / maxByGroup;
+          student.events.length || 0;
+      ponderated = student.puntuation / maxByGroup || 0;
     }
   });
 </script>
@@ -80,16 +80,18 @@
     modalHeading={$_('set_event', { name: name || '' })}
     on:close={close}
     passiveModal>
-    <div class="row">
-      Puntuation:
-      {student.puntuation}
-      Calculated:
-      {((positive + ponderated) / 2).toFixed(2)}
-      Positive:
-      {positive.toFixed(2)}
-      Ponderated:
-      {ponderated.toFixed(2)}
-    </div>
+    {#if student}
+      <div class="row">
+        Puntuation:
+        {student.puntuation}
+        Calculated:
+        {((positive + ponderated) / 2).toFixed(2)}
+        Positive:
+        {positive.toFixed(2)}
+        Ponderated:
+        {ponderated.toFixed(2)}
+      </div>
+    {/if}
     <Tabs type="container">
       <Tab
         label={$_('add_positive')}
