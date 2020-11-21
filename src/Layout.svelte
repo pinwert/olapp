@@ -18,6 +18,7 @@
   } from 'carbon-components-svelte';
   import { _ } from 'svelte-intl';
   import {
+    journey,
     groups,
     groupSelected,
     negativeEvents,
@@ -86,6 +87,12 @@
   <div slot="skip-to-content">
     <SkipToContent />
   </div>
+  <Button kind="ghost" on:click={() => journey.set([])}>
+    {$_('init_journey')}
+  </Button>
+  <Button kind="ghost" on:click={() => session.set({})}>
+    {$_('clean_session')}
+  </Button>
   <HeaderUtilities>
     <HeaderAction bind:isOpen>
       <HeaderPanelLinks>
@@ -123,9 +130,6 @@
           groupSelected.set(group);
         }} />
     {/each}
-    <Button kind="ghost" on:click={() => session.set({})}>
-      {$_('clean_session')}
-    </Button>
   </SideNavItems>
 </SideNav>
 
