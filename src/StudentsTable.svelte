@@ -2,7 +2,7 @@
   import { Checkbox, Grid, Row, Tile, Column } from 'carbon-components-svelte';
   import type { IStudent } from './interfaces';
 
-  import { selecteds, session, showActions } from './store';
+  import { journey, selecteds, session, showActions } from './store';
   export let students: Array<IStudent>;
   export let sortBy: 'alphabetical' | 'more-points' | 'less-points';
   $: sortedStudents =
@@ -86,8 +86,8 @@
         <div class="card">
           <Tile
             light={$selecteds.includes(student.id)}
-            on:click={() => showActions.set([student])}
-            style="cursor: pointer;">
+            style={$journey.includes(student.id) ? 'cursor: default; background-color: rgba(240,128,128, 0.4);' : 'cursor: pointer;'}
+            on:click={() => showActions.set([student])}>
             <div class="row">
               <Checkbox
                 style="padding: 10px"

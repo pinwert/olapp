@@ -48,3 +48,11 @@ export const session = writable(
 session.subscribe(value => {
   localStorage.setItem('session', JSON.stringify(value));
 });
+
+export const journey = writable(
+  (JSON.parse(localStorage.getItem('journey')) || []) as Array<string>;
+);
+
+journey.subscribe(value => {
+  localStorage.setItem('journey', JSON.stringify(value));
+});

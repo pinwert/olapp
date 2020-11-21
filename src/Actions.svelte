@@ -4,7 +4,7 @@
     Button,
     ButtonSet,
     DataTable,
-    TextInput,
+    Tag,
     NumberInput,
     Form,
     Checkbox,
@@ -12,8 +12,11 @@
     Tabs,
     Tab,
     TabContent,
+    TextInput,
+    Toggle,
   } from 'carbon-components-svelte';
   import {
+    journey,
     showActions,
     students,
     negativeEvents,
@@ -71,25 +74,64 @@
     margin: 20px;
     color: white;
   }
+  .row {
+    display: flex;
+    justify-content: space-between;
+    flex: 1;
+  }
+  .column {
+    display: flex;
+    flex: 1;
+    justify-content: space-between;
+    flex-direction: column;
+    padding-bottom: 5px;
+  }
 </style>
 
 {#if open}
   <Modal
     size="lg"
+    hasForm
     {open}
     modalHeading={$_('set_event', { name: name || '' })}
     on:close={close}
     passiveModal>
     {#if student}
       <div class="row">
-        Puntuation:
-        {student.puntuation}
-        Calculated:
-        {((positive + ponderated) / 2).toFixed(2)}
-        Positive:
-        {positive.toFixed(2)}
-        Ponderated:
-        {ponderated.toFixed(2)}
+        <div class="column">
+          <Toggle
+            labelText={$_('in_class')}
+            labelA="No"
+            labelB="Yes"
+            toggled={!$journey.includes(student.id)}
+            on:click={e => {
+              e.stopPropagation();
+              e.preventDefault();
+              if (!$journey.includes(student.id)) {
+                journey.set([...$journey, student.id]);
+              } else {
+                const idx = $journey.indexOf(student.id);
+                if (idx > -1) $journey.splice(idx, 1);
+                journey.set([...$journey]);
+              }
+            }} />
+        </div>
+        <div class="column">
+          Puntuation
+          <Tag>{student.puntuation.toFixed(2)}</Tag>
+        </div>
+        <div class="column">
+          Calculated
+          <Tag>{((positive + ponderated) / 2).toFixed(2)}</Tag>
+        </div>
+        <div class="column">
+          Nº Pos / Nº total
+          <Tag>{positive.toFixed(2)}</Tag>
+        </div>
+        <div class="column">
+          My / Max
+          <Tag>{ponderated.toFixed(2)}</Tag>
+        </div>
       </div>
     {/if}
     <Tabs type="container">

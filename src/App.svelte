@@ -18,6 +18,7 @@
   import {
     groups,
     groupSelected,
+    journey,
     negativeEvents,
     positiveEvents,
     selecteds,
@@ -35,7 +36,10 @@
   const setEvent = (event: IAction) => {
     $showActions.forEach(st => {
       const idx = $students.findIndex(s => s.id === st.id);
-      if (idx > -1) {
+      if (
+        idx > -1 &&
+        (!$journey.includes(st.id) || $showActions.length === 1)
+      ) {
         $students[idx].events = [
           ...$students[idx].events,
           {
