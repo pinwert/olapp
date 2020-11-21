@@ -122,7 +122,7 @@
         </div>
         <div class="column">
           Calculated
-          <Tag>{((positive + ponderated) / 2).toFixed(2)}</Tag>
+          <Tag type="blue">{((positive + ponderated) / 2).toFixed(2)}</Tag>
         </div>
         <div class="column">
           Nº Pos / Nº total
