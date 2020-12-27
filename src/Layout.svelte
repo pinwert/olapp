@@ -15,8 +15,8 @@
     Grid,
     Row,
     Column,
-  } from 'carbon-components-svelte';
-  import { _ } from 'svelte-intl';
+  } from "carbon-components-svelte";
+  import { _ } from "svelte-intl";
   import {
     journey,
     groups,
@@ -25,7 +25,7 @@
     positiveEvents,
     session,
     students,
-  } from './store';
+  } from "./store";
 
   let isSideNavOpen = false;
   let isOpen = false;
@@ -33,17 +33,17 @@
   export let showModal: (m: string) => void;
 
   function inport() {
-    let element = document.createElement('input');
-    element.setAttribute('type', 'file');
+    let element = document.createElement("input");
+    element.setAttribute("type", "file");
 
-    element.style.display = 'none';
+    element.style.display = "none";
     document.body.appendChild(element);
 
     element.click();
     element.onblur = () => document.body.removeChild(element);
     element.onchange = () => {
       const reader = new FileReader();
-      reader.onload = event => {
+      reader.onload = (event) => {
         const obj = JSON.parse(event.target.result as string);
         inportData(obj);
       };
@@ -52,7 +52,7 @@
     };
   }
 
-  const inportData = obj => {
+  const inportData = (obj) => {
     students.set(obj.students);
     groups.set(obj.groups);
     positiveEvents.set(obj.positiveEvents);
@@ -61,7 +61,7 @@
 
   function exportData() {
     var dataUri =
-      'data:application/json;charset=utf-8,' +
+      "data:application/json;charset=utf-8," +
       encodeURIComponent(
         JSON.stringify({
           students: $students,
@@ -70,11 +70,11 @@
           negativeEvents: $negativeEvents,
         })
       );
-    let element = document.createElement('a');
-    element.setAttribute('href', dataUri);
-    element.setAttribute('download', 'data.json');
+    let element = document.createElement("a");
+    element.setAttribute("href", dataUri);
+    element.setAttribute("download", "data.json");
 
-    element.style.display = 'none';
+    element.style.display = "none";
     document.body.appendChild(element);
 
     element.click();
@@ -109,6 +109,13 @@
         <HeaderPanelDivider>{$_('edit')}:</HeaderPanelDivider>
         <HeaderPanelLink on:click={() => showModal('showEditEvent')}>
           {$_('edit_event')}
+        </HeaderPanelLink>
+        <HeaderPanelLink
+          on:click={() => {
+            exportData();
+            showModal('showClearEvents');
+          }}>
+          {$_('clear_events')}
         </HeaderPanelLink>
 
         <HeaderPanelDivider>{$_('export_inport')}</HeaderPanelDivider>

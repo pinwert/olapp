@@ -1,20 +1,20 @@
 <script lang="ts">
-  import './translations';
-  import { _ } from 'svelte-intl';
-  import Actions from './Actions.svelte';
+  import "./translations";
+  import { _ } from "svelte-intl";
+  import Actions from "./Actions.svelte";
   import {
     Button,
     ButtonSet,
     SelectItem,
     Select,
-  } from 'carbon-components-svelte';
-  import CreateEvent from './CreateEvent.svelte';
-  import CreateGroup from './CreateGroup.svelte';
-  import CreateStudent from './CreateStudent.svelte';
-  import type { IAction, IStudent } from './interfaces';
-  import StudentsTable from './StudentsTable.svelte';
-  import Layout from './Layout.svelte';
-  import EditEvent from './EditEvent.svelte';
+  } from "carbon-components-svelte";
+  import CreateEvent from "./CreateEvent.svelte";
+  import CreateGroup from "./CreateGroup.svelte";
+  import CreateStudent from "./CreateStudent.svelte";
+  import type { IAction, IStudent } from "./interfaces";
+  import StudentsTable from "./StudentsTable.svelte";
+  import Layout from "./Layout.svelte";
+  import EditEvent from "./EditEvent.svelte";
   import {
     groups,
     groupSelected,
@@ -25,17 +25,18 @@
     session,
     showActions,
     students,
-  } from './store';
+  } from "./store";
+  import ClearEvents from "./ClearEvents.svelte";
 
-  let modalToShow: string = !$groups.length ? 'showCreateGroup' : '';
-  $: studentsInGroup = $students.filter(s => s.group === $groupSelected);
-  let sortBy: 'alphabetical' | 'more-points' | 'less-points' = 'alphabetical';
+  let modalToShow: string = !$groups.length ? "showCreateGroup" : "";
+  $: studentsInGroup = $students.filter((s) => s.group === $groupSelected);
+  let sortBy: "alphabetical" | "more-points" | "less-points" = "alphabetical";
   const showModal = (m: string) => {
     modalToShow = m;
   };
-  const setEvent = (event: IAction) => {
-    $showActions.forEach(st => {
-      const idx = $students.findIndex(s => s.id === st.id);
+  const setEvent = (event: IAction, when: string) => {
+    $showActions.forEach((st) => {
+      const idx = $students.findIndex((s) => s.id === st.id);
       if (
         idx > -1 &&
         (!$journey.includes(st.id) || $showActions.length === 1)
@@ -44,7 +45,7 @@
           ...$students[idx].events,
           {
             eventType: event.label,
-            createdAt: new Date().getTime(),
+            createdAt: new Date(when).getTime(),
             puntuation: event.puntuaction,
           },
         ];
@@ -67,7 +68,7 @@
     showActions.set([]);
   };
   const close = () => {
-    modalToShow = '';
+    modalToShow = "";
   };
   const randomIndex = (min, max) => {
     min = Math.ceil(min);
@@ -80,7 +81,7 @@
       $selecteds.length ? $selecteds.length - 1 : studentsInGroup.length - 1
     );
     const student = $selecteds.length
-      ? studentsInGroup.find(s => s.id === $selecteds[idx])
+      ? studentsInGroup.find((s) => s.id === $selecteds[idx])
       : studentsInGroup[idx];
     showActions.set([student]);
   };
@@ -97,14 +98,14 @@
   <ButtonSet>
     <Button
       kind="ghost"
-      on:click={() => selecteds.set($selecteds.length === studentsInGroup.length ? [] : studentsInGroup.map(s => s.id))}>
+      on:click={() => selecteds.set($selecteds.length === studentsInGroup.length ? [] : studentsInGroup.map((s) => s.id))}>
       {$selecteds.length === studentsInGroup.length ? $_('unselect_all') : $_('select_all')}
     </Button>
     <Button kind="ghost" on:click={selectRandom}>{$_('select_random')}</Button>
     {#if $selecteds.length > 0}
       <Button
-        on:click={() => showActions.set($selecteds.map(s =>
-              studentsInGroup.find(st => st.id === s)
+        on:click={() => showActions.set($selecteds.map((s) =>
+              studentsInGroup.find((st) => st.id === s)
             ))}>
         {$_('add_event')}
       </Button>
@@ -127,24 +128,26 @@
 <CreateGroup
   {close}
   open={modalToShow === 'showCreateGroup'}
-  send={group => {
+  send={(group) => {
     groups.set([...$groups, group]);
     modalToShow = '';
   }} />
-<Actions
-  name={$showActions.length && `${$showActions[0].name} ${$showActions.length > 1 ? `and ${$showActions.length - 1} more` : ''}`}
-  {setEvent}
-  open={!!$showActions.length}
-  student={$showActions.length === 1 ? $showActions[0] : undefined}
-  {maxByGroup}
-  close={() => {
-    showActions.set([]);
-  }} />
+{#if $showActions.length}
+  <Actions
+    name={$showActions.length && `${$showActions[0].name} ${$showActions.length > 1 ? `and ${$showActions.length - 1} more` : ''}`}
+    {setEvent}
+    open={!!$showActions.length}
+    student={$showActions.length === 1 ? $showActions[0] : undefined}
+    {maxByGroup}
+    close={() => {
+      showActions.set([]);
+    }} />
+{/if}
 <CreateStudent
   open={modalToShow === 'showCreateStudent'}
   {close}
   group={$groupSelected}
-  send={newStudent => {
+  send={(newStudent) => {
     students.set([...$students, newStudent]);
     modalToShow = '';
   }}
@@ -154,7 +157,7 @@
   open={modalToShow === 'showCreateEvent'}
   {close}
   title={$_('create_event')}
-  send={newEvent => {
+  send={(newEvent) => {
     if (newEvent.puntuaction < 0) {
       negativeEvents.set([...$negativeEvents, newEvent]);
     } else {
@@ -164,3 +167,4 @@
   }} />
 
 <EditEvent open={modalToShow === 'showEditEvent'} {close} />
+<ClearEvents open={modalToShow === 'showClearEvents'} {close} />

@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type { IAction, IEvent } from './interfaces';
-  import { Modal, Tabs, Tab, TabContent } from 'carbon-components-svelte';
-  import { negativeEvents, positiveEvents } from './store';
-  import CreateEvent from './CreateEvent.svelte';
-  import { _ } from 'svelte-intl';
+  import type { IAction } from "./interfaces";
+  import { Modal, Tabs, Tab, TabContent } from "carbon-components-svelte";
+  import { negativeEvents, positiveEvents } from "./store";
+  import CreateEvent from "./CreateEvent.svelte";
+  import { _ } from "svelte-intl";
   export let close: () => void;
   export let open: boolean;
   let eventSelected: IAction;
@@ -58,13 +58,13 @@
     event={eventSelected}
     close={() => (eventSelected = undefined)}
     title={$_('edit_event')}
-    send={newEvent => {
-      const idx = $negativeEvents.findIndex(e => e.label === eventSelected.label);
+    send={(newEvent) => {
+      const idx = $negativeEvents.findIndex((e) => e.label === eventSelected.label);
       if (idx > -1) {
         $negativeEvents[idx] = newEvent;
         negativeEvents.set($negativeEvents);
       } else {
-        const idx = $positiveEvents.findIndex(e => e.label === eventSelected.label);
+        const idx = $positiveEvents.findIndex((e) => e.label === eventSelected.label);
         if (idx > -1) {
           $positiveEvents[idx] = newEvent;
           positiveEvents.set($positiveEvents);
