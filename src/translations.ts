@@ -46,8 +46,10 @@ translations.update({
     edit_negative: 'Edit negative',
     history: 'History',
     set_event: 'Set event: {name}',
-    init_journey: 'Init journey',
+    init_journey: 'Start journey',
     in_class: 'In class',
+    when: 'When',
+    clear_events: 'Clear events',
   },
   es: {
     unselect_all: 'Deseleccionar todos',
@@ -96,6 +98,8 @@ translations.update({
     set_event: 'Añadir evento: {name}',
     init_journey: 'Iniciar jornada',
     in_class: 'En clase',
+    when: 'Cuando',
+    clear_events: 'Limpiar eventos',
   },
 });
 

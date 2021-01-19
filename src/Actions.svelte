@@ -1,9 +1,11 @@
 <script lang="ts">
-  import type { IAction, IStudent } from './interfaces';
+  import type { IAction, IStudent } from "./interfaces";
   import {
     Button,
     ButtonSet,
     DataTable,
+    DatePicker,
+    DatePickerInput,
     Tag,
     NumberInput,
     Form,
@@ -14,30 +16,31 @@
     TabContent,
     TextInput,
     Toggle,
-  } from 'carbon-components-svelte';
+  } from "carbon-components-svelte";
   import {
     journey,
     showActions,
     students,
     negativeEvents,
     positiveEvents,
-  } from './store';
-  import { beforeUpdate } from 'svelte';
-  import { _ } from 'svelte-intl';
+  } from "./store";
+  import { beforeUpdate } from "svelte";
+  import { _ } from "svelte-intl";
   export let name: string;
   export let student: IStudent;
-  export let setEvent: (e: IAction) => void;
+  export let setEvent: (e: IAction, when?: string) => void;
   export let close: () => void;
   export let open: boolean;
   export let maxByGroup: number;
   let newStudent = student;
-  let studentName = student ? student.name : '';
-  let label: string = '';
+  let studentName = student ? student.name : "";
+  let label: string = "";
   let puntuation: string;
   let deleteIt: boolean;
   let showDelete: boolean;
+  let date = Date.now();
   const editStudent = (s: IStudent) => {
-    const idx = $students.findIndex(st => st.id === s.id);
+    const idx = $students.findIndex((st) => st.id === s.id);
     if (idx > -1) {
       $students[idx] = s;
       students.set($students);
@@ -45,12 +48,12 @@
     showActions.set([]);
   };
   const deleteStudent = (s: IStudent) => {
-    students.set($students.filter(st => st.id !== s.id));
+    students.set($students.filter((st) => st.id !== s.id));
     showActions.set([]);
   };
 
   let positive = student
-    ? student.events.filter(e => e.puntuation >= 0).length /
+    ? student.events.filter((e) => e.puntuation >= 0).length /
         student.events.length || 0
     : 0;
   let ponderated = student ? student.puntuation / maxByGroup || 0 : 0;
@@ -59,7 +62,7 @@
       studentName = student.name;
       newStudent = student;
       positive =
-        student.events.filter(e => e.puntuation >= 0).length /
+        student.events.filter((e) => e.puntuation >= 0).length /
           student.events.length || 0;
       ponderated = student.puntuation / maxByGroup || 0;
     }
@@ -104,7 +107,7 @@
             labelA="No"
             labelB="Yes"
             toggled={!$journey.includes(student.id)}
-            on:click={e => {
+            on:click={(e) => {
               e.stopPropagation();
               e.preventDefault();
               if (!$journey.includes(student.id)) {
@@ -151,19 +154,33 @@
       <div slot="content">
         <TabContent>
           {#each $positiveEvents as event}
-            <div class="event" on:click={() => setEvent(event)}>
+            <div class="event" on:click={() => setEvent(event, date)}>
               {event.label}
               ({event.puntuaction})
             </div>
           {/each}
+
+          <DatePicker datePickerType="single" bind:value={date}>
+            <DatePickerInput
+              size="sm"
+              labelText={$_('when')}
+              placeholder="mm/dd/yyyy" />
+          </DatePicker>
         </TabContent>
         <TabContent>
           {#each $negativeEvents as event}
-            <div class="event" on:click={() => setEvent(event)}>
+            <div class="event" on:click={() => setEvent(event, date)}>
               {event.label}
               ({event.puntuaction})
             </div>
           {/each}
+
+          <DatePicker datePickerType="single" bind:value={date}>
+            <DatePickerInput
+              size="sm"
+              labelText={$_('when')}
+              placeholder="mm/dd/yyyy" />
+          </DatePicker>
         </TabContent>
         <TabContent>
           <Form
@@ -172,6 +189,12 @@
             }}>
             <TextInput labelText="Label" bind:value={label} />
             <NumberInput mobile label="Puntuation" bind:value={puntuation} />
+            <DatePicker datePickerType="single" bind:value={date}>
+              <DatePickerInput
+                size="sm"
+                labelText={$_('when')}
+                placeholder="mm/dd/yyyy" />
+            </DatePicker>
             <ButtonSet style="padding-top: 10px;">
               <Button type="submit">Submit</Button>
             </ButtonSet>
@@ -183,28 +206,26 @@
               <DataTable
                 sortable
                 headers={[{ key: 'eventType', value: 'Event' }, { key: 'createdAt', value: 'Date' }, { key: 'puntuation', value: 'Puntuation' }]}
-                rows={student.events.map((s, idx) => ({
-                  ...s,
-                  createdAt: (() => {
-                    const d = new Date(s.createdAt);
-                    const ye = new Intl.DateTimeFormat('en', {
-                      year: 'numeric',
-                    }).format(d);
-                    const mo = new Intl.DateTimeFormat('en', {
-                      month: 'short',
-                    }).format(d);
-                    const da = new Intl.DateTimeFormat('en', {
-                      day: '2-digit',
-                    }).format(d);
-                    return `${da}-${mo}-${ye}`;
-                  })(),
-                  id: idx,
-                }))} />
+                rows={student.events
+                  .sort((a, b) => a.createdAt - b.createdAt)
+                  .map((s, idx) => ({ ...s, createdAt: (() => {
+                      const d = new Date(s.createdAt);
+                      const ye = new Intl.DateTimeFormat('en', {
+                        year: 'numeric',
+                      }).format(d);
+                      const mo = new Intl.DateTimeFormat('en', {
+                        month: 'short',
+                      }).format(d);
+                      const da = new Intl.DateTimeFormat('en', {
+                        day: '2-digit',
+                      }).format(d);
+                      return `${da}-${mo}-${ye}`;
+                    })(), id: idx }))} />
             </TabContent>
           {/if}
           <TabContent>
             <Form
-              on:submit={e => {
+              on:submit={(e) => {
                 e.preventDefault();
                 editStudent({ ...student, name: studentName });
               }}>
