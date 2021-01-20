@@ -58,7 +58,7 @@ journey.subscribe(value => {
 });
 
 export const from = writable(
-  (JSON.parse(localStorage.getItem('from')) || []) as number
+  (JSON.parse(localStorage.getItem('from')) || '') as number
 );
 
 from.subscribe(value => {
@@ -66,7 +66,7 @@ from.subscribe(value => {
 });
 
 export const to = writable(
-  (JSON.parse(localStorage.getItem('to')) || []) as number
+  (JSON.parse(localStorage.getItem('to')) || '') as number
 );
 
 to.subscribe(value => {

@@ -102,8 +102,8 @@ translations.update({
     in_class: 'En clase',
     when: 'Cuando',
     clear_events: 'Limpiar eventos',
-    from: 'From',
-    to: 'To',
+    from: 'Desde',
+    to: 'Hasta',
   },
 });
 
