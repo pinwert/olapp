@@ -50,9 +50,25 @@ session.subscribe(value => {
 });
 
 export const journey = writable(
-  (JSON.parse(localStorage.getItem('journey')) || []) as Array<string>;
+  (JSON.parse(localStorage.getItem('journey')) || []) as Array<string>
 );
 
 journey.subscribe(value => {
   localStorage.setItem('journey', JSON.stringify(value));
+});
+
+export const from = writable(
+  (JSON.parse(localStorage.getItem('from')) || []) as number
+);
+
+from.subscribe(value => {
+  localStorage.setItem('from', JSON.stringify(value));
+});
+
+export const to = writable(
+  (JSON.parse(localStorage.getItem('to')) || []) as number
+);
+
+to.subscribe(value => {
+  localStorage.setItem('to', JSON.stringify(value));
 });

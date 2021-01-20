@@ -50,6 +50,8 @@ translations.update({
     in_class: 'In class',
     when: 'When',
     clear_events: 'Clear events',
+    from: 'From',
+    to: 'To',
   },
   es: {
     unselect_all: 'Deseleccionar todos',
@@ -100,6 +102,8 @@ translations.update({
     in_class: 'En clase',
     when: 'Cuando',
     clear_events: 'Limpiar eventos',
+    from: 'From',
+    to: 'To',
   },
 });
 

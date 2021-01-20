@@ -2,7 +2,7 @@
   import { Checkbox, Grid, Row, Tile, Column } from 'carbon-components-svelte';
   import type { IStudent } from './interfaces';
 
-  import { journey, selecteds, session, showActions } from './store';
+  import { journey, selecteds, session, showActions, from, to } from './store';
   export let students: Array<IStudent>;
   export let sortBy: 'alphabetical' | 'more-points' | 'less-points';
   $: sortedStudents =
@@ -36,6 +36,63 @@
       }
     });
 </script>
+
+<Grid fullWidth noGutter>
+  <Row>
+    {#each sortedStudents as student}
+      <Column>
+        <div class="card">
+          <Tile
+            light={$selecteds.includes(student.id)}
+            style={$journey.includes(student.id)
+              ? 'cursor: default; background-color: rgba(240,128,128, 0.4);'
+              : 'cursor: pointer;'}
+            on:click={() => showActions.set([student])}
+          >
+            <div class="row">
+              <Checkbox
+                style="padding: 10px"
+                checked={$selecteds.includes(student.id)}
+                on:click={e => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  if (!$selecteds.includes(student.id)) {
+                    selecteds.set([...$selecteds, student.id]);
+                  } else {
+                    const idx = $selecteds.indexOf(student.id);
+                    if (idx > -1) $selecteds.splice(idx, 1);
+                    selecteds.set([...$selecteds]);
+                  }
+                }}
+              />
+              {#if $session[student.id]}
+                <div class="flags">
+                  {#each $session[student.id] as color}
+                    <div class="flag" style="--color: {color};" />
+                  {/each}
+                </div>
+              {/if}
+              <div class="number">
+                {(!$from && !$to && student.puntuation) ||
+                  student.events
+                    .filter(
+                      e =>
+                        (!$from || new Date($from).getTime() < e.createdAt) &&
+                        (!$to || new Date($to).getTime() > e.createdAt)
+                    )
+                    .reduce((acc, s) => {
+                      acc = acc + s.puntuation;
+                      return acc;
+                    }, 0)}
+              </div>
+            </div>
+            <div class="name">{student.name}</div>
+          </Tile>
+        </div>
+      </Column>
+    {/each}
+  </Row>
+</Grid>
 
 <style>
   .card {
@@ -78,49 +135,3 @@
     box-shadow: 1px 1px grey;
   }
 </style>
-
-<Grid fullWidth noGutter>
-  <Row>
-    {#each sortedStudents as student}
-      <Column>
-        <div class="card">
-          <Tile
-            light={$selecteds.includes(student.id)}
-            style={$journey.includes(student.id) ? 'cursor: default; background-color: rgba(240,128,128, 0.4);' : 'cursor: pointer;'}
-            on:click={() => showActions.set([student])}>
-            <div class="row">
-              <Checkbox
-                style="padding: 10px"
-                checked={$selecteds.includes(student.id)}
-                on:click={e => {
-                  e.stopPropagation();
-                  e.preventDefault();
-                  if (!$selecteds.includes(student.id)) {
-                    selecteds.set([...$selecteds, student.id]);
-                  } else {
-                    const idx = $selecteds.indexOf(student.id);
-                    if (idx > -1) $selecteds.splice(idx, 1);
-                    selecteds.set([...$selecteds]);
-                  }
-                }} />
-              {#if $session[student.id]}
-                <div class="flags">
-                  {#each $session[student.id] as color}
-                    <div class="flag" style="--color: {color};" />
-                  {/each}
-                </div>
-              {/if}
-              <div class="number">
-                {student.puntuation || student.events.reduce((acc, s) => {
-                    acc = acc + s.puntuation;
-                    return acc;
-                  }, 0)}
-              </div>
-            </div>
-            <div class="name">{student.name}</div>
-          </Tile>
-        </div>
-      </Column>
-    {/each}
-  </Row>
-</Grid>
