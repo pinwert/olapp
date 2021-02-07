@@ -5,6 +5,7 @@
   import {
     Button,
     ButtonSet,
+    Row,
     SelectItem,
     Select,
   } from 'carbon-components-svelte';
@@ -104,45 +105,48 @@
 </script>
 
 <Layout {showModal}>
-  <ButtonSet>
-    <Button
-      kind="ghost"
-      on:click={() =>
-        selecteds.set(
-          $selecteds.length === studentsInGroup.length
-            ? []
-            : studentsInGroup.map(s => s.id)
-        )}
-    >
-      {$selecteds.length === studentsInGroup.length
-        ? $_('unselect_all')
-        : $_('select_all')}
-    </Button>
-    <Button kind="ghost" on:click={selectRandom}>{$_('select_random')}</Button>
-    {#if $selecteds.length > 0}
+  <Row>
+    <ButtonSet>
       <Button
+        kind="ghost"
         on:click={() =>
-          showActions.set(
-            $selecteds.map(s => studentsInGroup.find(st => st.id === s))
+          selecteds.set(
+            $selecteds.length === studentsInGroup.length
+              ? []
+              : studentsInGroup.map(s => s.id)
           )}
       >
-        {$_('add_event')}
+        {$selecteds.length === studentsInGroup.length
+          ? $_('unselect_all')
+          : $_('select_all')}
       </Button>
-    {/if}
-    <Select
-      inline
-      labelText={$_('sort_by')}
-      bind:selected={sortBy}
-      style={'padding-left: 10px;'}
-    >
-      <SelectItem value="alphabetical" text={$_('alphabetical')} />
-      <SelectItem value="more-points" text={$_('more_points')} />
-      <SelectItem value="less-points" text={$_('less_points')} />
-    </Select>
-    <Button kind="ghost" on:click={() => showModal('showCreateStudent')}>
-      {$_('new_student')}
-    </Button>
-  </ButtonSet>
+      <Button kind="ghost" on:click={selectRandom}>{$_('select_random')}</Button
+      >
+      {#if $selecteds.length > 0}
+        <Button
+          on:click={() =>
+            showActions.set(
+              $selecteds.map(s => studentsInGroup.find(st => st.id === s))
+            )}
+        >
+          {$_('add_event')}
+        </Button>
+      {/if}
+      <Select
+        inline
+        labelText={$_('sort_by')}
+        bind:selected={sortBy}
+        style={'padding-left: 10px;'}
+      >
+        <SelectItem value="alphabetical" text={$_('alphabetical')} />
+        <SelectItem value="more-points" text={$_('more_points')} />
+        <SelectItem value="less-points" text={$_('less_points')} />
+      </Select>
+      <Button kind="ghost" on:click={() => showModal('showCreateStudent')}>
+        {$_('new_student')}
+      </Button>
+    </ButtonSet>
+  </Row>
   <StudentsTable students={studentsInGroup} {sortBy} />
 </Layout>
 <CreateGroup

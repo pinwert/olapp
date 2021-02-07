@@ -1,19 +1,22 @@
 <script lang="ts">
+  import { cardColors } from './colors';
   import type { IAction, IStudent } from './interfaces';
   import {
     Button,
     ButtonSet,
+    Checkbox,
     DataTable,
     DatePicker,
     DatePickerInput,
-    Tag,
-    NumberInput,
     Form,
-    Checkbox,
+    Grid,
     Modal,
-    Tabs,
+    NumberInput,
+    Row,
     Tab,
     TabContent,
+    Tabs,
+    Tag,
     TextInput,
     Toggle,
   } from 'carbon-components-svelte';
@@ -157,20 +160,33 @@
       {/if}
       <div slot="content">
         <TabContent>
-          {#each $positiveEvents as event}
-            <div class="event" on:click={() => setEvent(event, date)}>
-              {event.label}
-              ({event.puntuaction})
-            </div>
-          {/each}
-
-          <DatePicker datePickerType="single" bind:value={date}>
-            <DatePickerInput
-              size="sm"
-              labelText={$_('when')}
-              placeholder="mm/dd/yyyy"
-            />
-          </DatePicker>
+          <Grid fullWidth noGutter>
+            <DatePicker datePickerType="single" bind:value={date}>
+              <DatePickerInput
+                size="sm"
+                labelText={$_('when')}
+                placeholder="mm/dd/yyyy"
+              />
+            </DatePicker>
+            <Row>
+              {#each $positiveEvents as event}
+                <div
+                  class="event"
+                  on:click={() => setEvent(event, date)}
+                  style={`background-color: ${cardColors[
+                    event.label
+                      ? event.label.trim().charCodeAt(0) % cardColors.length
+                      : 0
+                  ].replace('1)', '0.4)')}`}
+                >
+                  {event.label}
+                  <span class="value">
+                    {event.puntuaction}
+                  </span>
+                </div>
+              {/each}
+            </Row>
+          </Grid>
         </TabContent>
         <TabContent>
           {#each $negativeEvents as event}
@@ -258,15 +274,13 @@
                   kind="danger"
                   on:click={() => {
                     showDelete = true;
-                  }}
-                >Delete</Button
+                  }}>Delete</Button
                 >
                 <Button
                   kind="secondary"
                   on:click={() => {
                     studentName = student.name;
-                  }}
-                >Cancel</Button
+                  }}>Cancel</Button
                 >
                 <Button type="submit">Save</Button>
               </ButtonSet>
@@ -301,10 +315,19 @@
 <style>
   .event {
     border-radius: 6px;
-    background-color: rgba(23, 23, 23, 0.3);
+    background-color: rgba(23, 23, 23, 0.1);
     padding: 20px;
     margin: 20px;
-    color: white;
+    color: black;
+    min-width: 20%;
+    display: flex;
+    justify-content: space-between;
+  }
+  .value {
+    color: black;
+    background-color: white;
+    border-radius: 50%;
+    padding: 0px 6px 1px;
   }
   .row {
     display: flex;

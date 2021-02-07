@@ -163,14 +163,10 @@
   </SideNavItems>
 </SideNav>
 
-<Content>
-  <Grid>
-    <Row>
-      <Column>
-        <slot />
-      </Column>
-    </Row>
-  </Grid>
+<Content
+  style={`height: calc(100% - 47px); overflow: hidden; display: flex; flex-direction: column; padding:0;`}
+>
+  <slot />
 </Content>
 
 <style>
