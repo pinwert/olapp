@@ -164,7 +164,7 @@
 </SideNav>
 
 <Content
-  style={`height: calc(100% - 47px); overflow: hidden; display: flex; flex-direction: column; padding:0;`}
+  style={`height: calc(100vh - 47px); overflow: hidden; display: flex; flex-direction: column; padding:0;`}
 >
   <slot />
 </Content>
