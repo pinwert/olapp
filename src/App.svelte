@@ -105,7 +105,7 @@
 </script>
 
 <Layout {showModal}>
-  <Row>
+  <Row style="min-height: 48px;">
     <ButtonSet>
       <Button
         kind="ghost"
