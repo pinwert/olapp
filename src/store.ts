@@ -24,13 +24,15 @@ groupSelected.subscribe(value => {
 });
 
 export const positiveEvents = writable(
-  (JSON.parse(localStorage.getItem('positiveEvents')) || []) as Array<IAction>
+  ((JSON.parse(localStorage.getItem('positiveEvents')) ||
+    []) as Array<IAction>).filter(a => a.label)
 );
 positiveEvents.subscribe(value => {
   localStorage.setItem('positiveEvents', JSON.stringify(value));
 });
 export const negativeEvents = writable(
-  (JSON.parse(localStorage.getItem('negativeEvents')) || []) as Array<IAction>
+  ((JSON.parse(localStorage.getItem('negativeEvents')) ||
+    []) as Array<IAction>).filter(a => a.label)
 );
 negativeEvents.subscribe(value => {
   localStorage.setItem('negativeEvents', JSON.stringify(value));
