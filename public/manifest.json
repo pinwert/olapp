@@ -1,7 +1,7 @@
 {
-  "name": "Olga App",
+  "name": "OlApp classroom",
   "short_name": "OlApp",
-  "theme_color": "#5bd1d7",
+  "theme_color": "#c3c82c",
   "background_color": "#f6f5f5",
   "display": "standalone",
   "Scope": "/",
