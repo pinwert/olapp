@@ -64,13 +64,13 @@
       )
     : [];
   let totalPuntuation = student
-    ? events.reduce((acc, s) => {
-        acc = acc + s.puntuation;
+    ? events.reduce((acc, e) => {
+        acc = acc + e.puntuation;
         return acc;
       }, 0)
     : 0;
   let positive = student
-    ? events.filter(e => e.puntuation >= 0).length / student.events.length || 0
+    ? events.filter(e => e.puntuation >= 0).length / events.length || 0
     : 0;
   let ponderated = student ? totalPuntuation / maxByGroup || 0 : 0;
   beforeUpdate(() => {
@@ -83,10 +83,9 @@
       studentName = student.name;
       newStudent = student;
       positive =
-        events.filter(e => e.puntuation >= 0).length / student.events.length ||
-        0;
-      totalPuntuation = events.reduce((acc, s) => {
-        acc = acc + s.puntuation;
+        events.filter(e => e.puntuation >= 0).length / events.length || 0;
+      totalPuntuation = events.reduce((acc, e) => {
+        acc = acc + e.puntuation;
         return acc;
       }, 0);
       ponderated = totalPuntuation / maxByGroup || 0;
@@ -153,7 +152,7 @@
       />
       <Tab label={$_('add_comment')} />
       {#if student}
-        {#if student.events.length}
+        {#if events.length}
           <Tab label={$_('history')} />
         {/if}
         <Tab label={$_('edit')} />
@@ -225,7 +224,7 @@
           </Form>
         </TabContent>
         {#if student}
-          {#if student.events.length}
+          {#if events.length}
             <TabContent>
               <DataTable
                 sortable
@@ -234,12 +233,7 @@
                   { key: 'createdAt', value: 'Date' },
                   { key: 'puntuation', value: 'Puntuation' },
                 ]}
-                rows={student.events
-                  .filter(
-                    e =>
-                      (!$from || new Date($from).getTime() < e.createdAt) &&
-                      (!$to || new Date($to).getTime() > e.createdAt)
-                  )
+                rows={events
                   .sort((a, b) => a.createdAt - b.createdAt)
                   .map((s, idx) => ({
                     ...s,
