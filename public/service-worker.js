@@ -2,6 +2,8 @@ var cacheName = 'sgtoilet-cache-' + Date.now();
 var filesToCache = [
   '/',
   '/index.html',
+  '/favicon.png',
+  '/global.css',
   '/build/bundle.js',
   '/build/bundle.css',
 ];
