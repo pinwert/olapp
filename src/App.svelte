@@ -102,6 +102,10 @@
     if (p > ac) return p;
     return ac;
   }, 0);
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/service-worker.js');
+  }
 </script>
 
 <Layout {showModal}>

@@ -1,0 +1,22 @@
+{
+  "name": "OlApp classroom",
+  "short_name": "OlApp",
+  "theme_color": "#c3c82c",
+  "background_color": "#f6f5f5",
+  "display": "standalone",
+  "Scope": "/",
+  "start_url": "/index.html",
+  "icons": [
+    {
+      "src": "/favicon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "splash_pages": null
+}
