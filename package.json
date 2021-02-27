@@ -27,6 +27,10 @@
     "typescript": "^4.0.0"
   },
   "dependencies": {
+    "@carbon/charts": "^0.41.39",
+    "@carbon/charts-svelte": "^0.41.39",
+    "carbon-components": "^10.29.0",
+    "d3": "5.x",
     "format-message": "^6.2.3",
     "node-sass": "^5.0.0",
     "sirv-cli": "^1.0.0",

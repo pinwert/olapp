@@ -20,6 +20,7 @@
     TextInput,
     Toggle,
   } from 'carbon-components-svelte';
+  import { DonutChart } from '@carbon/charts-svelte';
   import {
     journey,
     showActions,
@@ -31,6 +32,7 @@
   } from './store';
   import { beforeUpdate } from 'svelte';
   import { _ } from 'svelte-intl';
+  import { Alignments } from '@carbon/charts/interfaces';
   export let name: string;
   export let student: IStudent;
   export let setEvent: (e: IAction, when?: number) => void;
@@ -92,6 +94,13 @@
     }
   });
 </script>
+
+<svelte:head>
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/@carbon/charts/styles.min.css"
+  />
+</svelte:head>
 
 {#if open}
   <Modal
@@ -226,6 +235,90 @@
         {#if student}
           {#if events.length}
             <TabContent>
+              <Row>
+                <div class="card">
+                  <DonutChart
+                    data={[
+                      {
+                        group: 'Positive',
+                        value: events.reduce((acc, e) => {
+                          if (e.puntuation > 0) ++acc;
+                          return acc;
+                        }, 0),
+                      },
+                      {
+                        group: 'Negative',
+                        value: events.reduce((acc, e) => {
+                          if (e.puntuation < 0) ++acc;
+                          return acc;
+                        }, 0),
+                      },
+                    ]}
+                    options={{
+                      resizable: true,
+                      donut: {
+                        center: {
+                          label: 'Positive/Negative',
+                        },
+                        alignment: Alignments.CENTER,
+                      },
+                      color: {
+                        scale: {
+                          Positive: 'rgba(23, 150, 23,0.3)',
+                          Negative: 'rgba(150, 23, 23,0.3)',
+                        },
+                      },
+                      height: '300px',
+                    }}
+                  />
+                </div>
+                <div class="card">
+                  <DonutChart
+                    data={events.reduce((acc, e) => {
+                      if (e.puntuation > 0) {
+                        const selected = acc.find(a => a.group === e.eventType);
+                        if (selected) ++selected.value;
+                        else acc.push({ group: e.eventType, value: 1 });
+                      }
+
+                      return acc;
+                    }, [])}
+                    options={{
+                      resizable: true,
+                      donut: {
+                        center: {
+                          label: 'Positives',
+                        },
+                        alignment: Alignments.CENTER,
+                      },
+                      height: '300px',
+                    }}
+                  />
+                </div>
+                <div class="card">
+                  <DonutChart
+                    data={events.reduce((acc, e) => {
+                      if (e.puntuation < 0) {
+                        const selected = acc.find(a => a.group === e.eventType);
+                        if (selected) ++selected.value;
+                        else acc.push({ group: e.eventType, value: 1 });
+                      }
+
+                      return acc;
+                    }, [])}
+                    options={{
+                      resizable: true,
+                      donut: {
+                        center: {
+                          label: 'Negatives',
+                        },
+                        alignment: Alignments.CENTER,
+                      },
+                      height: '300px',
+                    }}
+                  />
+                </div>
+              </Row>
               <DataTable
                 sortable
                 headers={[
@@ -334,5 +427,14 @@
     justify-content: space-between;
     flex-direction: column;
     padding-bottom: 5px;
+  }
+  .card {
+    padding: 3%;
+    padding-left: 0px;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    align-items: center;
+    flex: 1;
   }
 </style>
