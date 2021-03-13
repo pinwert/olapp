@@ -10,6 +10,7 @@
     DatePickerInput,
     Form,
     Grid,
+    Icon,
     Modal,
     NumberInput,
     Row,
@@ -20,6 +21,7 @@
     TextInput,
     Toggle,
   } from 'carbon-components-svelte';
+  import Delete20 from 'carbon-icons-svelte/lib/Delete20';
   import { DonutChart } from '@carbon/charts-svelte';
   import {
     journey,
@@ -36,6 +38,7 @@
   export let name: string;
   export let student: IStudent;
   export let setEvent: (e: IAction, when?: number) => void;
+  export let deleteEvent: (index: number) => void;
   export let close: () => void;
   export let open: boolean;
   export let maxByGroup: number;
@@ -45,6 +48,7 @@
   let puntuation: string;
   let deleteIt: boolean;
   let showDelete: boolean;
+  let showDeleteEvent: number | undefined;
   let date = Date.now();
   const editStudent = (s: IStudent) => {
     const idx = $students.findIndex(st => st.id === s.id);
@@ -76,7 +80,7 @@
     : 0;
   let ponderated = student ? totalPuntuation / maxByGroup || 0 : 0;
   beforeUpdate(() => {
-    if (student && (!newStudent || newStudent.name !== student.name)) {
+    if (student /* && (!newStudent || newStudent.name !== student.name)*/) {
       events = student.events.filter(
         e =>
           (!$from || new Date($from).getTime() < e.createdAt) &&
@@ -325,6 +329,7 @@
                   { key: 'eventType', value: 'Event' },
                   { key: 'createdAt', value: 'Date' },
                   { key: 'puntuation', value: 'Puntuation' },
+                  { key: 'delete', value: 'Delete' },
                 ]}
                 rows={events
                   .sort((a, b) => a.createdAt - b.createdAt)
@@ -345,7 +350,20 @@
                     })(),
                     id: idx,
                   }))}
-              />
+              >
+                <span slot="cell" let:row let:cell>
+                  {#if cell.key === 'delete'}
+                    <div
+                      class="delete"
+                      on:click={() => {
+                        showDeleteEvent = row.id;
+                      }}
+                    >
+                      <Icon render={Delete20} />
+                    </div>
+                  {:else}{cell.value}{/if}
+                </span>
+              </DataTable>
             </TabContent>
           {/if}
           <TabContent>
@@ -397,6 +415,25 @@
   >
     <Checkbox labelText="I am sure to delete it" bind:checked={deleteIt} />
   </Modal>
+
+  <Modal
+    open={typeof showDeleteEvent === 'number'}
+    modalHeading={`Confirm delete`}
+    on:submit={() => {
+      deleteEvent(showDeleteEvent);
+      showDeleteEvent = undefined;
+    }}
+    on:close={() => {
+      showDeleteEvent = undefined;
+    }}
+    secondaryButtonText="Cancel"
+    on:click:button--secondary={() => {
+      showDeleteEvent = undefined;
+    }}
+    primaryButtonText="Proceed"
+  >
+    <p>Are you sure to delete this event</p>
+  </Modal>
 {/if}
 
 <style>
@@ -436,5 +473,8 @@
     flex-direction: row;
     align-items: center;
     flex: 1;
+  }
+  .delete {
+    cursor: pointer;
   }
 </style>

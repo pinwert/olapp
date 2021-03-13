@@ -70,6 +70,31 @@
     });
     showActions.set([]);
   };
+  const deleteEvent = (eventIndex: number) => {
+    $showActions.forEach(st => {
+      const idx = $students.findIndex(s => s.id === st.id);
+      if (idx > -1 && $showActions.length === 1) {
+        const ev = $positiveEvents.find(
+          e => e.label === $students[idx].events[eventIndex].eventType
+        );
+        if (ev.color && $session[st.id]?.includes(ev.color)) {
+          const colorIdx = $session[st.id].indexOf(ev.color);
+          $session[st.id].splice(colorIdx, 1);
+          $session[st.id] = [...$session[st.id]];
+        }
+        $students[idx].events.splice(eventIndex, 1);
+        $students[idx].events = [...$students[idx].events];
+
+        $students[idx].puntuation = $students[idx].events.reduce((acc, s) => {
+          acc = acc + s.puntuation;
+          return acc;
+        }, 0);
+
+        students.set($students);
+        session.set($session);
+      }
+    });
+  };
   const close = () => {
     modalToShow = '';
   };
@@ -136,12 +161,7 @@
           {$_('add_event')}
         </Button>
       {/if}
-      <Select
-        inline
-        labelText={$_('sort_by')}
-        bind:selected={sortBy}
-        style={'padding-left: 10px;'}
-      >
+      <Select inline labelText={$_('sort_by')} bind:selected={sortBy}>
         <SelectItem value="alphabetical" text={$_('alphabetical')} />
         <SelectItem value="more-points" text={$_('more_points')} />
         <SelectItem value="less-points" text={$_('less_points')} />
@@ -168,6 +188,7 @@
         $showActions.length > 1 ? `and ${$showActions.length - 1} more` : ''
       }`}
     {setEvent}
+    {deleteEvent}
     open={!!$showActions.length}
     student={$showActions.length === 1 ? $showActions[0] : undefined}
     {maxByGroup}
@@ -205,4 +226,8 @@
 <ClearEvents open={modalToShow === 'showClearEvents'} {close} />
 
 <style>
+  :global(.bx--select--inline .bx--select-input) {
+    margin-bottom: 0.25em;
+    margin-top: 0.25em;
+  }
 </style>
