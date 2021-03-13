@@ -74,10 +74,15 @@
     $showActions.forEach(st => {
       const idx = $students.findIndex(s => s.id === st.id);
       if (idx > -1 && $showActions.length === 1) {
-        const ev = $positiveEvents.find(
-          e => e.label === $students[idx].events[eventIndex].eventType
-        );
-        if (ev.color && $session[st.id]?.includes(ev.color)) {
+        const ev =
+          $positiveEvents.find(
+            e => e.label === $students[idx].events[eventIndex].eventType
+          ) ||
+          $negativeEvents.find(
+            e => e.label === $students[idx].events[eventIndex].eventType
+          );
+
+        if (ev?.color && $session[st.id]?.includes(ev.color)) {
           const colorIdx = $session[st.id].indexOf(ev.color);
           $session[st.id].splice(colorIdx, 1);
           $session[st.id] = [...$session[st.id]];
