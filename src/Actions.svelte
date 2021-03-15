@@ -201,20 +201,33 @@
           </Grid>
         </TabContent>
         <TabContent>
-          {#each $negativeEvents as event}
-            <div class="event" on:click={() => setEvent(event, date)}>
-              {event.label}
-              ({event.puntuaction})
-            </div>
-          {/each}
-
-          <DatePicker datePickerType="single" bind:value={date}>
-            <DatePickerInput
-              size="sm"
-              labelText={$_('when')}
-              placeholder="mm/dd/yyyy"
-            />
-          </DatePicker>
+          <Grid fullWidth noGutter>
+            <DatePicker datePickerType="single" bind:value={date}>
+              <DatePickerInput
+                size="sm"
+                labelText={$_('when')}
+                placeholder="mm/dd/yyyy"
+              />
+            </DatePicker>
+            <Row>
+              {#each $negativeEvents as event}
+                <div
+                  class="event"
+                  on:click={() => setEvent(event, date)}
+                  style={`background-color: ${cardColors[
+                    event.label
+                      ? event.label.trim().charCodeAt(0) % cardColors.length
+                      : 0
+                  ].replace('1)', '0.4)')}`}
+                >
+                  {event.label}
+                  <span class="value">
+                    {event.puntuaction}
+                  </span>
+                </div>
+              {/each}
+            </Row>
+          </Grid>
         </TabContent>
         <TabContent>
           <Form
